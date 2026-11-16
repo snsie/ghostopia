@@ -76,3 +76,25 @@ Problems hit during the tasks and the workaround used. Newest at the bottom.
   lights from candles and lanterns). Shadows of a few small lights may drop in those previews; no effect on
   the data.
 - No bloom in EEVEE any more; a numpy bloom on the saved PNG stands in for Godot's glow.
+
+## Task 4 (2026-11-16)
+
+- Blender 5.2: `NlaStrip.extend_mode` doesn't exist; it is `extrapolation` ('HOLD'). Clips are posed by muting every
+  other NLA track and sliding the strip with `frame_start_ui` so all characters render at one scene frame.
+- The test framework reported PASS for a test that hit a GDScript runtime error (`SCRIPT ERROR ... Invalid access to
+  property 'fragment_chance'`; air has no such key). The test is fixed; **task5 should make runtime errors fail tests**.
+- A bash heredoc holding a long Markdown/Python patch failed to parse again; the README patch went through a scratch
+  `.py` file, as in task1.
+- **No tray prop in task1.** Wren's `serve_drinks` steps say `held_item: tray`; the renders show her without it.
+  Task5 needs a small tray prop or can leave the hand empty.
+- **Villagers are small next to the concept.** The concept paintings draw villagers about twice as big relative to the
+  houses; at true scale (1.1–1.8 m against task1's cottages) they are a few pixels tall in the wide Millbrook view, so a
+  closer `square_close` camera was added.
+- **The mill's rocking chair faces away from the camera** (layout yaw 210°), so Agnes is seen from behind in
+  `mill_night`; the concept shows her facing the viewer. Left as is: the chair orientation is task3 data.
+- **Lantern pools read violet, not warm orange,** against the blue night preset (task3's lighting); the concept's warm
+  firelight is stronger. Godot's lighting in task5 should push carried and post lanterns warmer.
+- **Wren's cottage stands on task3's east path** (the path was stamped first), so routes east detour north around it.
+  Harmless; the routes are walkable.
+- EEVEE still reports `Shadow buffer full` on the wide views (the villagers' candles and lanterns add lights). Some small
+  shadows may drop in the previews; no effect on the data.

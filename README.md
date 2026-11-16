@@ -84,6 +84,23 @@ Options: `-- --only millbrook,mill,plan`, `-- --moods night,day`, `-- --res 1920
 generator, pure numpy; the hand layout constants are at its top), `build_island.py` (output, Blender mesher,
 moods, cameras). The generator is deterministic: Blender and plain Python write byte-identical files.
 
+### Task 4: population (data in about 1 s, renders about 3 minutes)
+
+```bash
+python blender/scripts/build_population.py --json-only                # millbrook_population.json + memory_fragments.json
+                                                                      # + renders/task4/population_map.png
+"$B" -b --factory-startup -P blender/scripts/build_population.py      # data + renders/task4/* + blender/millbrook_population.blend
+python tools/population_map.py renders/task4/population_map.png --villager agnes   # one villager's routes only
+```
+
+Options: `-- --only millbrook,mill`, `-- --moods night,dusk`, `-- --res 1920x1080`, `-- --no-render`, `-- --no-blend`.
+The build calls `python tools/compare_sheets.py --task task4` at the end (concept left, render right). Code:
+`lib_population_content.py` (hand-written: villagers, lines, schedules, hauntable kinds, scare rules, town memory, nodes,
+effects, memory fragments), `lib_population.py` (A* routing over the voxel surface, schedule timing on the day/night
+cycle, alone / facing-away / dark-stretch analysis, coverage checks, JSON output; plain Python), `population_render.py`
+(poses the villagers in the task3 island scene through the `hook` of `build_island.blender_main`). It reads the task1-3
+data and never writes it. Deterministic.
+
 ## Level data: `assets/levels/millbrook_layout.json`
 
 Godot axes everywhere (x east, y up, z south), metres, 1 block = 1 m; `yaw` = Godot `rotation.y` in degrees
@@ -102,3 +119,32 @@ Godot axes everywhere (x east, y up, z south), metres, 1 block = 1 m; `yaw` = Go
 | `water` | `[{id: "stream", block, running_water: true, cells: [[x, y, z, flow_x, flow_z, waterfall], ...]}]` |
 | `lighting` | `presets` `night` `dusk` `dawn` `day` `fading`: `sun`/`moon` (elevation, azimuth, `direction` the light travels, colour, energy, shadows), `ambient`, `sky` (top, horizon, void, moon disc, stars), `fog` (colour, density, height fog), `emission` (windows/lanterns/flames on or off, `GLOW_*` energy), `lamps_energy`, `saturation`, `exposure`, `glow_bloom`; `cycle` keyframes (`t` in [0, 1), nominal `hour`, `preset`) and phase ranges |
 | `map` | `world_rect` covered by the plan render `renders/task3/millbrook_plan.png` (12 px per metre, image x → +x, image y → +z) |
+
+## Population data: `assets/levels/millbrook_population.json`
+
+Same units as the layout. **Every gameplay number is a placeholder** (`"tuning": true`); Scott tunes feel. Hours are
+clock hours; `t` is the layout's day/night cycle position (`lighting.cycle`: 1200 s, night = t 0.08-0.58).
+
+| Key | Contents |
+|---|---|
+| `cycle` | cycle length, keys (copied from the layout), `night_seconds_per_hour` (~71 s) and `day_seconds_per_hour` (~30 s) |
+| `scare_rules` | Unease stages (fraction of `nerve` -> clip, walk clip, expression), overflow = bolt, `fear_match_mult`, skeptic threshold, vulnerability, break, grade score and grades (Spooked / Terrified / Legendary), Fright and Remembrance payouts, suspicion gain, botch |
+| `villagers[]` | `id`, `name`, `pronouns` {subject, object, possessive}, `role` (`target` or `witness`), `character` + `gltf`, `home` (structure id), `home_marker`, `bed`, `personality`, `backstory`, `belief` 0-1, `fear` (dark, dolls, being_alone, loud_noises, mirrors; null for the witness), `fear_story`, `fear_object` (hauntable id), `skeptic`, `nerve` (Unease to break), `suspicion_rate`, `bravery_gain` (nerve gained per botch), `unease_decay_per_s`, `default_item`, `charm`, `walk_speed_mps`, `flee_speed_mps`, `mutters` {`lines` (5-8), `hint`, `radius_m`, `cooldown_s`, ...}, `suspicious_reactions[]` {`at_suspicion`, `action`, `animation`, `target`, `effect`, `line`}, `on_break`, `on_botch`, `witness` (Pip only), `schedule[]` |
+| `schedule[]` | One full cycle from 17:00 to 17:00 with no gaps (`t_end` of a step = `t_start` of the next). Every step: `id`, `kind` (`stay` / `walk`), `activity`, `start`/`end` ("HH:MM"), `start_hour`, `end_hour`, `t_start`, `t_end`, `duration_s` (real seconds), `phase`, `animation` (task2 clip), `held_item`, `alone`, `alone_fraction`, `company` (who is with them: the same interior, or outdoors within 10 m; sleepers don't count), `vulnerable`. `stay` adds `marker` (layout marker or null), `target` (prop instance used), `pos`, `yaw`, `area`, `indoors`, `expression`, `facing_away_from` (hiding spots, doors and wardrobes within 9 m that are more than 100 degrees behind them), `back_to_hiding_spot`, `asleep`, `note`. `walk` adds `route` (waypoints from A* over the voxels, preferring paths), `ladder_waypoints` (indices reached by climbing), `length_m`, `speed_mps`, `light` (carried candle or lantern), `dark_stretches_m` ([from, to] metres along the route out of reach of lantern and window light; dusk, night and dawn only), `dark_m`, `crosses` (`bridge`), `hauntables_on_route` (within 3 m), `hiding_spots_on_route` |
+| `hauntables[]` | `id`, `kind` (door, floorboard, candle, oil_lamp, lantern, rocking_chair, wardrobe, portrait, doll, bell, scarecrow), `instance` (layout instance id), `prop`, `pos`, `yaw`, `owner`, `area`, `resident`, `room`, `source` (`layout`; `population` = lanterns added as Flicker targets; `carried` = the light in a villager's hand, with `carried_by`, `socket`, `node` or `attach_prop`, `during_steps`), `haunt_shell`, `path` + `level` + `ability` (Creak = level 1 doors and floorboards, Flicker = level 2 candles, lamps and lanterns, level 3+ = decorative in the slice), `slice_active`, `actions`, `unease` per action, `fears`, `fear_note`, `noise_radius_m` (wakes sleepers, reaches listeners), `cooldown_s`, `int_nodes` |
+| `hauntable_kinds` | the per-kind defaults used above |
+| `nodes` | `kinds` (tool, tier, hits, yields, regrow, fragment_chance) and `list[]`: `id`, `kind` (grave_weeds, fiber_grass, grave_dirt, eerie_ore_vein, spectral_stone_vein, iron_ore_vein), `marker`, `pos`, `area`, `tool`, `tier`, `block` (+ `cell` and `face` for voxel ore), `hits`, `yields` (voxel nodes use the blocks.json drops), `regrow` {seconds, nights, condition}, `fragment_chance` |
+| `town_memory` | `rules[]` (`repeat_trick` -> charm, object un-hauntable for N nights; `botched_scare` -> salt line across a door; `legendary_scare` / `terrified_scare` -> rumor + legend points; `witnessed` x3; `believer`), `legend` (signature -> `epithets`, `stages` with name templates such as `the {epithet} Ghost of {town}` and a Remembrance bonus), `rumors` (`templates` with `{victim} {they} {object} {place} {trick_past} {legend} {hour}`, `trick_past`, tellers) |
+| `fx` | `list[]` by `type`: `chimney_smoke` (pos above each chimney, `when: hearth_lit`), `hearth_flame` / `candle_flame` / `lantern_glow` (`attach`: props + node prefix; Godot binds them on every instance), `fireflies` / `low_mist` (`box` [x0, y0, z0, x1, y1, z1]), `water_sparkle` (`points`), `waterfall_spray` (`pos`, `flow`), `rotate` (windmill sails: `instance`, `node` ANIM_sails, `rpm`), `swing` (tavern sign), `ore_wisps`, `portal_glow` (mausoleum door), `grave_wisps`, `worker_ghost` (`character`, `gltf`, `grave`, `pos`, `yaw`, `animation`, `ambience_only`). Each has `moods` or `when` plus its particle parameters |
+| `checks` | per villager: `home_level12`, `route_level12`, `fear_objects`, `fear_objects_level12`, `ok` (at least 3 level 1-2 hauntables at home and on their routes, at least 1 fear object) |
+
+## Memory fragments: `assets/data/memory_fragments.json`
+
+| Key | Contents |
+|---|---|
+| `owners[]` | past people: `id`, `name`, `pronouns`, `life`, `set` (or null), `resident` (the worker ghost character the set unlocks), `skill`, `grave_wish`, `related_living` |
+| `sets[]` | three sets of five (`set_blacksmith`, `set_gardener`, `set_baker`): `fragments`, `unlocks_resident`, `resident_skill`, `grave_wish` |
+| `fragments[]` (30) | `id`, `text` (the one-line vignette), `owner`, `owner_name`, `set`, `emotion` (nostalgia, grief, regret, joy: Memory Loom input), `source` {`blocks`, `areas`, `weight`}, `vignette` (subject of the sepia journal card) |
+| `drop_tables` | per block id with a `fragment_chance` in blocks.json: `chance` and `entries[]` {`fragment`, `weight`, `areas`}. Roll `chance` when the block is mined, then pick by weight among uncollected fragments, x3 for entries whose `areas` include the area it was mined in |
+| `journal` | card style notes for task5 |
+

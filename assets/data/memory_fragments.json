@@ -1,0 +1,1168 @@
+{
+ "version": 1,
+ "generator": "blender/scripts/build_population.py (lib_population_content.py)",
+ "note": "Memory fragments drop when natural blocks are mined. Roll the block's `chance`; on a hit pick from its table by weight among fragments not yet collected, x3 weight for entries whose `areas` contain the area the block was mined in (an empty `areas` list means anywhere). If every fragment of the table is collected, drop nothing (or a duplicate as crafting material, task5's choice).",
+ "tuning": true,
+ "owners": [
+  {
+   "id": "hob_ashdown",
+   "name": "Hob Ashdown",
+   "pronouns": "he/him",
+   "life": "Millbrook's blacksmith",
+   "set": "set_blacksmith",
+   "resident": "worker_blacksmith",
+   "skill": "Tool upgrades at the Spectral Workbench take half as long.",
+   "grave_wish": "a grave by the ore outcrop, where he can hear stone ring"
+  },
+  {
+   "id": "marigold_finch",
+   "name": "Marigold Finch",
+   "pronouns": "she/her",
+   "life": "the village gardener",
+   "set": "set_gardener",
+   "resident": "worker_gardener",
+   "skill": "Tended graves grow grave moss; grave weeds regrow half as fast.",
+   "grave_wish": "a grave with room for flowers"
+  },
+  {
+   "id": "ned_ollery",
+   "name": "Ned Ollery",
+   "pronouns": "he/him",
+   "life": "the baker on the square",
+   "set": "set_baker",
+   "resident": "worker_baker",
+   "skill": "Worker ghosts near his grave work 15% faster (he keeps everyone fed, in spirit).",
+   "grave_wish": "a warm grave facing the morning"
+  },
+  {
+   "id": "elsie_brook",
+   "name": "Elsie Brook",
+   "pronouns": "she/her",
+   "life": "Agnes's daughter, who died young",
+   "set": null,
+   "related_living": "agnes",
+   "note": "Partial set; completes in run 2 (more fragments elsewhere)."
+  },
+  {
+   "id": "josiah_brook",
+   "name": "Josiah Brook",
+   "pronouns": "he/him",
+   "life": "the miller, Agnes's late husband",
+   "set": null,
+   "related_living": "agnes",
+   "note": "Partial set; completes in run 2."
+  },
+  {
+   "id": "old_wynn",
+   "name": "Old Wynn",
+   "pronouns": "he/him",
+   "life": "the bell-ringer",
+   "set": null,
+   "note": "Partial set; completes in run 2."
+  },
+  {
+   "id": "hettie_lark",
+   "name": "Hettie Lark",
+   "pronouns": "she/her",
+   "life": "Millbrook's first schoolmistress",
+   "set": null,
+   "note": "Partial set; completes in run 2. Marlow teaches from her old books."
+  },
+  {
+   "id": "unknown",
+   "name": "Someone",
+   "pronouns": "they/them",
+   "life": "nobody remembers who",
+   "set": null,
+   "note": "Strays: memories whose owner is forgotten."
+  }
+ ],
+ "sets": [
+  {
+   "id": "set_blacksmith",
+   "owner": "hob_ashdown",
+   "name": "Hob Ashdown",
+   "pronouns": "he/him",
+   "fragments": [
+    "frag_hob_1",
+    "frag_hob_2",
+    "frag_hob_3",
+    "frag_hob_4",
+    "frag_hob_5"
+   ],
+   "unlocks_resident": "worker_blacksmith",
+   "resident_skill": "Tool upgrades at the Spectral Workbench take half as long.",
+   "grave_wish": "a grave by the ore outcrop, where he can hear stone ring"
+  },
+  {
+   "id": "set_gardener",
+   "owner": "marigold_finch",
+   "name": "Marigold Finch",
+   "pronouns": "she/her",
+   "fragments": [
+    "frag_marigold_1",
+    "frag_marigold_2",
+    "frag_marigold_3",
+    "frag_marigold_4",
+    "frag_marigold_5"
+   ],
+   "unlocks_resident": "worker_gardener",
+   "resident_skill": "Tended graves grow grave moss; grave weeds regrow half as fast.",
+   "grave_wish": "a grave with room for flowers"
+  },
+  {
+   "id": "set_baker",
+   "owner": "ned_ollery",
+   "name": "Ned Ollery",
+   "pronouns": "he/him",
+   "fragments": [
+    "frag_ned_1",
+    "frag_ned_2",
+    "frag_ned_3",
+    "frag_ned_4",
+    "frag_ned_5"
+   ],
+   "unlocks_resident": "worker_baker",
+   "resident_skill": "Worker ghosts near his grave work 15% faster (he keeps everyone fed, in spirit).",
+   "grave_wish": "a warm grave facing the morning"
+  }
+ ],
+ "fragments": [
+  {
+   "id": "frag_hob_1",
+   "text": "He hummed the same three notes with every hammer stroke, and never the fourth.",
+   "owner": "hob_ashdown",
+   "owner_name": "Hob Ashdown",
+   "set": "set_blacksmith",
+   "emotion": "nostalgia",
+   "source": {
+    "blocks": [
+     "iron_ore",
+     "stone"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "a broad-shouldered smith mid-swing at an anvil, sparks like a scatter of stars"
+  },
+  {
+   "id": "frag_hob_2",
+   "text": "He made tiny iron horseshoes for the village children, and pretended he hadn't.",
+   "owner": "hob_ashdown",
+   "owner_name": "Hob Ashdown",
+   "set": "set_blacksmith",
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "eerie_ore",
+     "spectral_stone"
+    ],
+    "areas": [
+     "graveyard"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a big sooty hand dropping a thumbnail-sized horseshoe into a child's palm"
+  },
+  {
+   "id": "frag_hob_3",
+   "text": "His anvil had a dent shaped like a heart. He swore it was an accident.",
+   "owner": "hob_ashdown",
+   "owner_name": "Hob Ashdown",
+   "set": "set_blacksmith",
+   "emotion": "nostalgia",
+   "source": {
+    "blocks": [
+     "stone",
+     "iron_ore"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "close-up of an old anvil face with a small heart-shaped dent catching the forge light"
+  },
+  {
+   "id": "frag_hob_4",
+   "text": "He mended the square bell's crack twice and charged Old Wynn in apples.",
+   "owner": "hob_ashdown",
+   "owner_name": "Hob Ashdown",
+   "set": "set_blacksmith",
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "eerie_ore",
+     "stone"
+    ],
+    "areas": [
+     "millbrook_square",
+     "graveyard"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a smith and a stooped old man sharing a basket of apples beside a cracked bell"
+  },
+  {
+   "id": "frag_hob_5",
+   "text": "On his last night he banked the forge so it would still be warm in the morning.",
+   "owner": "hob_ashdown",
+   "owner_name": "Hob Ashdown",
+   "set": "set_blacksmith",
+   "emotion": "grief",
+   "source": {
+    "blocks": [
+     "spectral_stone",
+     "stone"
+    ],
+    "areas": [
+     "graveyard"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "an empty smithy at night, a low red glow under banked coals, a leather apron on a hook"
+  },
+  {
+   "id": "frag_marigold_1",
+   "text": "She always saved the last pumpkin seed for next year.",
+   "owner": "marigold_finch",
+   "owner_name": "Marigold Finch",
+   "set": "set_gardener",
+   "emotion": "nostalgia",
+   "source": {
+    "blocks": [
+     "grass",
+     "dirt"
+    ],
+    "areas": [
+     "fields"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a weathered hand tucking one pale pumpkin seed into a twist of paper"
+  },
+  {
+   "id": "frag_marigold_2",
+   "text": "She talked to the bean rows, and the bean rows, she said, mostly listened.",
+   "owner": "marigold_finch",
+   "owner_name": "Marigold Finch",
+   "set": "set_gardener",
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "flowers",
+     "tall_grass"
+    ],
+    "areas": [
+     "fields"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a woman in a sunhat kneeling between bean poles, mid-sentence"
+  },
+  {
+   "id": "frag_marigold_3",
+   "text": "She planted forget-me-nots on the graves nobody visited any more.",
+   "owner": "marigold_finch",
+   "owner_name": "Marigold Finch",
+   "set": "set_gardener",
+   "emotion": "grief",
+   "source": {
+    "blocks": [
+     "grave_moss",
+     "grave_dirt"
+    ],
+    "areas": [
+     "graveyard"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "small blue flowers being pressed into the soil before a mossy, nameless headstone"
+  },
+  {
+   "id": "frag_marigold_4",
+   "text": "Her hands smelled of tomato leaves well into December.",
+   "owner": "marigold_finch",
+   "owner_name": "Marigold Finch",
+   "set": "set_gardener",
+   "emotion": "nostalgia",
+   "source": {
+    "blocks": [
+     "dirt",
+     "grass"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "two earthy hands cupped around a mug by a frosted window"
+  },
+  {
+   "id": "frag_marigold_5",
+   "text": "She pressed one flower from every spring in a book she never let anyone read.",
+   "owner": "marigold_finch",
+   "owner_name": "Marigold Finch",
+   "set": "set_gardener",
+   "emotion": "regret",
+   "source": {
+    "blocks": [
+     "flowers",
+     "leaves"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "an open book of pressed flowers, one page left empty"
+  },
+  {
+   "id": "frag_ned_1",
+   "text": "He was up before the rooster every day, and never once let the rooster know.",
+   "owner": "ned_ollery",
+   "owner_name": "Ned Ollery",
+   "set": "set_baker",
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "wheat"
+    ],
+    "areas": [
+     "fields"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a round baker peeking out of a bakery door at a sleeping rooster, in the dark"
+  },
+  {
+   "id": "frag_ned_2",
+   "text": "He baked a loaf shaped like a hedgehog for any child who cried in his shop.",
+   "owner": "ned_ollery",
+   "owner_name": "Ned Ollery",
+   "set": "set_baker",
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "wheat",
+     "packed_path"
+    ],
+    "areas": [
+     "millbrook_square"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a hedgehog-shaped loaf on a counter, a small hand reaching up"
+  },
+  {
+   "id": "frag_ned_3",
+   "text": "He left the day's last bun on the step for whoever needed it more.",
+   "owner": "ned_ollery",
+   "owner_name": "Ned Ollery",
+   "set": "set_baker",
+   "emotion": "nostalgia",
+   "source": {
+    "blocks": [
+     "packed_path",
+     "dirt"
+    ],
+    "areas": [
+     "millbrook_square"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a single bun on a doorstep under a lantern, snow beginning"
+  },
+  {
+   "id": "frag_ned_4",
+   "text": "Flour in his eyebrows, flour in his beard: he said it kept him looking distinguished.",
+   "owner": "ned_ollery",
+   "owner_name": "Ned Ollery",
+   "set": "set_baker",
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "wheat",
+     "sand"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "a laughing baker with a beard white with flour"
+  },
+  {
+   "id": "frag_ned_5",
+   "text": "His wife's bread was never written down, so he baked it every morning to remember.",
+   "owner": "ned_ollery",
+   "owner_name": "Ned Ollery",
+   "set": "set_baker",
+   "emotion": "grief",
+   "source": {
+    "blocks": [
+     "oak_log",
+     "wheat"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "a baker kneading dough alone, a second apron folded on a stool"
+  },
+  {
+   "id": "frag_elsie_1",
+   "text": "Elsie named her rag doll Button and made it a coat from her own mitten.",
+   "owner": "elsie_brook",
+   "owner_name": "Elsie Brook",
+   "set": null,
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "grass",
+     "flowers"
+    ],
+    "areas": [
+     "windmill_rise",
+     "windmill"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a small girl sewing a tiny coat onto a rag doll by a window"
+  },
+  {
+   "id": "frag_elsie_2",
+   "text": "She raced the mill sails down the hill and swore she won every single time.",
+   "owner": "elsie_brook",
+   "owner_name": "Elsie Brook",
+   "set": null,
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "grass",
+     "packed_path"
+    ],
+    "areas": [
+     "windmill_rise",
+     "windmill"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a girl running downhill with arms out, the windmill sails turning behind her"
+  },
+  {
+   "id": "frag_elsie_3",
+   "text": "The winter she fell ill, she left Button on the shelf 'to keep watch for Mama'.",
+   "owner": "elsie_brook",
+   "owner_name": "Elsie Brook",
+   "set": null,
+   "emotion": "grief",
+   "source": {
+    "blocks": [
+     "leaves",
+     "flowers",
+     "grave_moss"
+    ],
+    "areas": [
+     "windmill",
+     "graveyard"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a rag doll in a mitten coat sitting alone on a shelf, facing the door"
+  },
+  {
+   "id": "frag_josiah_1",
+   "text": "Josiah could tell tomorrow's weather by the sound the sails made at dusk.",
+   "owner": "josiah_brook",
+   "owner_name": "Josiah Brook",
+   "set": null,
+   "emotion": "nostalgia",
+   "source": {
+    "blocks": [
+     "stone",
+     "oak_log"
+    ],
+    "areas": [
+     "windmill_rise",
+     "windmill"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a miller standing under the sails with his eyes closed, listening"
+  },
+  {
+   "id": "frag_josiah_2",
+   "text": "He carved Agnes's initials into the millstone, where only the flour could see.",
+   "owner": "josiah_brook",
+   "owner_name": "Josiah Brook",
+   "set": null,
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "stone"
+    ],
+    "areas": [
+     "windmill_rise",
+     "windmill"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "two initials carved small on the rim of a millstone, dusted with flour"
+  },
+  {
+   "id": "frag_josiah_3",
+   "text": "He whistled to the wind on still days so the sails wouldn't feel forgotten.",
+   "owner": "josiah_brook",
+   "owner_name": "Josiah Brook",
+   "set": null,
+   "emotion": "regret",
+   "source": {
+    "blocks": [
+     "leaves",
+     "oak_log"
+    ],
+    "areas": [
+     "windmill_rise"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a man on a hill whistling up at motionless windmill sails"
+  },
+  {
+   "id": "frag_wynn_1",
+   "text": "Wynn rang the bell once every evening, softly, just to say 'still here'.",
+   "owner": "old_wynn",
+   "owner_name": "Old Wynn",
+   "set": null,
+   "emotion": "nostalgia",
+   "source": {
+    "blocks": [
+     "packed_path",
+     "stone"
+    ],
+    "areas": [
+     "millbrook_square"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "an old man with a hand on a bell rope, the village roofs below in the dusk"
+  },
+  {
+   "id": "frag_wynn_2",
+   "text": "He counted the stars between chimes and lost count on purpose.",
+   "owner": "old_wynn",
+   "owner_name": "Old Wynn",
+   "set": null,
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "grass",
+     "tall_grass"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "an old man lying in tall grass, pointing up at a sky full of stars"
+  },
+  {
+   "id": "frag_wynn_3",
+   "text": "He gave the bell rope a name, and the name changed every week.",
+   "owner": "old_wynn",
+   "owner_name": "Old Wynn",
+   "set": null,
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "oak_log",
+     "leaves"
+    ],
+    "areas": [
+     "millbrook_square"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a frayed bell rope tied with a little ribbon bow"
+  },
+  {
+   "id": "frag_hettie_1",
+   "text": "She chalked the children's heights on the schoolroom door and never painted over them.",
+   "owner": "hettie_lark",
+   "owner_name": "Hettie Lark",
+   "set": null,
+   "emotion": "nostalgia",
+   "source": {
+    "blocks": [
+     "dirt",
+     "packed_path"
+    ],
+    "areas": [
+     "millbrook_square"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a wooden door covered in little chalk lines and names at different heights"
+  },
+  {
+   "id": "frag_hettie_2",
+   "text": "She read the same ghost story every harvest night and always cried at the end.",
+   "owner": "hettie_lark",
+   "owner_name": "Hettie Lark",
+   "set": null,
+   "emotion": "grief",
+   "source": {
+    "blocks": [
+     "grass",
+     "flowers"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "a schoolmistress reading by candlelight to children wrapped in blankets"
+  },
+  {
+   "id": "frag_hettie_3",
+   "text": "She kept a jar of lost buttons, in case anyone ever came looking for theirs.",
+   "owner": "hettie_lark",
+   "owner_name": "Hettie Lark",
+   "set": null,
+   "emotion": "regret",
+   "source": {
+    "blocks": [
+     "sand",
+     "dirt"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "a glass jar of mismatched buttons on a sunny windowsill"
+  },
+  {
+   "id": "frag_kite",
+   "text": "A child flew a red kite from this hill until the string ran out, then simply let it go.",
+   "owner": "unknown",
+   "owner_name": "Someone",
+   "set": null,
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "eerie_ore",
+     "grass",
+     "tall_grass"
+    ],
+    "areas": [
+     "graveyard"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "a child on a hilltop watching a kite drift away with its string trailing (mining_night concept)"
+  },
+  {
+   "id": "frag_sweethearts",
+   "text": "Two sweethearts met by the well every Sunday and pretended it was by chance.",
+   "owner": "unknown",
+   "owner_name": "Someone",
+   "set": null,
+   "emotion": "joy",
+   "source": {
+    "blocks": [
+     "sand",
+     "packed_path"
+    ],
+    "areas": [
+     "millbrook_square"
+    ],
+    "weight": 1.0
+   },
+   "vignette": "two figures at a well, both looking very hard at the bucket"
+  },
+  {
+   "id": "frag_marbles",
+   "text": "Someone buried a tin of marbles here, meaning to come back for it.",
+   "owner": "unknown",
+   "owner_name": "Someone",
+   "set": null,
+   "emotion": "regret",
+   "source": {
+    "blocks": [
+     "dirt",
+     "sand",
+     "grave_dirt"
+    ],
+    "areas": [],
+    "weight": 1.0
+   },
+   "vignette": "a rusty tin half-dug from the earth, marbles glinting inside"
+  }
+ ],
+ "drop_tables": {
+  "grass": {
+   "chance": 0.02,
+   "entries": [
+    {
+     "fragment": "frag_marigold_1",
+     "weight": 1.0,
+     "areas": [
+      "fields"
+     ]
+    },
+    {
+     "fragment": "frag_marigold_4",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_elsie_1",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise",
+      "windmill"
+     ]
+    },
+    {
+     "fragment": "frag_elsie_2",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise",
+      "windmill"
+     ]
+    },
+    {
+     "fragment": "frag_wynn_2",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_hettie_2",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_kite",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    }
+   ]
+  },
+  "dirt": {
+   "chance": 0.03,
+   "entries": [
+    {
+     "fragment": "frag_marigold_1",
+     "weight": 1.0,
+     "areas": [
+      "fields"
+     ]
+    },
+    {
+     "fragment": "frag_marigold_4",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_ned_3",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    },
+    {
+     "fragment": "frag_hettie_1",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    },
+    {
+     "fragment": "frag_hettie_3",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_marbles",
+     "weight": 1.0,
+     "areas": []
+    }
+   ]
+  },
+  "grave_dirt": {
+   "chance": 0.08,
+   "entries": [
+    {
+     "fragment": "frag_marigold_3",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_marbles",
+     "weight": 1.0,
+     "areas": []
+    }
+   ]
+  },
+  "sand": {
+   "chance": 0.02,
+   "entries": [
+    {
+     "fragment": "frag_ned_4",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_hettie_3",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_sweethearts",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    },
+    {
+     "fragment": "frag_marbles",
+     "weight": 1.0,
+     "areas": []
+    }
+   ]
+  },
+  "spectral_stone": {
+   "chance": 0.1,
+   "entries": [
+    {
+     "fragment": "frag_hob_2",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_hob_5",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    }
+   ]
+  },
+  "eerie_ore": {
+   "chance": 0.25,
+   "entries": [
+    {
+     "fragment": "frag_hob_2",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_hob_4",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square",
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_kite",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    }
+   ]
+  },
+  "iron_ore": {
+   "chance": 0.05,
+   "entries": [
+    {
+     "fragment": "frag_hob_1",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_hob_3",
+     "weight": 1.0,
+     "areas": []
+    }
+   ]
+  },
+  "wheat": {
+   "chance": 0.02,
+   "entries": [
+    {
+     "fragment": "frag_ned_1",
+     "weight": 1.0,
+     "areas": [
+      "fields"
+     ]
+    },
+    {
+     "fragment": "frag_ned_2",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    },
+    {
+     "fragment": "frag_ned_4",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_ned_5",
+     "weight": 1.0,
+     "areas": []
+    }
+   ]
+  },
+  "grave_moss": {
+   "chance": 0.06,
+   "entries": [
+    {
+     "fragment": "frag_marigold_3",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_elsie_3",
+     "weight": 1.0,
+     "areas": [
+      "windmill",
+      "graveyard"
+     ]
+    }
+   ]
+  },
+  "stone": {
+   "chance": 0.03,
+   "entries": [
+    {
+     "fragment": "frag_hob_1",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_hob_3",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_hob_4",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square",
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_hob_5",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_josiah_1",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise",
+      "windmill"
+     ]
+    },
+    {
+     "fragment": "frag_josiah_2",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise",
+      "windmill"
+     ]
+    },
+    {
+     "fragment": "frag_wynn_1",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    }
+   ]
+  },
+  "oak_log": {
+   "chance": 0.03,
+   "entries": [
+    {
+     "fragment": "frag_ned_5",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_josiah_1",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise",
+      "windmill"
+     ]
+    },
+    {
+     "fragment": "frag_josiah_3",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise"
+     ]
+    },
+    {
+     "fragment": "frag_wynn_3",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    }
+   ]
+  },
+  "leaves": {
+   "chance": 0.01,
+   "entries": [
+    {
+     "fragment": "frag_marigold_5",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_elsie_3",
+     "weight": 1.0,
+     "areas": [
+      "windmill",
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_josiah_3",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise"
+     ]
+    },
+    {
+     "fragment": "frag_wynn_3",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    }
+   ]
+  },
+  "tall_grass": {
+   "chance": 0.03,
+   "entries": [
+    {
+     "fragment": "frag_marigold_2",
+     "weight": 1.0,
+     "areas": [
+      "fields"
+     ]
+    },
+    {
+     "fragment": "frag_wynn_2",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_kite",
+     "weight": 1.0,
+     "areas": [
+      "graveyard"
+     ]
+    }
+   ]
+  },
+  "flowers": {
+   "chance": 0.04,
+   "entries": [
+    {
+     "fragment": "frag_marigold_2",
+     "weight": 1.0,
+     "areas": [
+      "fields"
+     ]
+    },
+    {
+     "fragment": "frag_marigold_5",
+     "weight": 1.0,
+     "areas": []
+    },
+    {
+     "fragment": "frag_elsie_1",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise",
+      "windmill"
+     ]
+    },
+    {
+     "fragment": "frag_elsie_3",
+     "weight": 1.0,
+     "areas": [
+      "windmill",
+      "graveyard"
+     ]
+    },
+    {
+     "fragment": "frag_hettie_2",
+     "weight": 1.0,
+     "areas": []
+    }
+   ]
+  },
+  "packed_path": {
+   "chance": 0.02,
+   "entries": [
+    {
+     "fragment": "frag_ned_2",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    },
+    {
+     "fragment": "frag_ned_3",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    },
+    {
+     "fragment": "frag_elsie_2",
+     "weight": 1.0,
+     "areas": [
+      "windmill_rise",
+      "windmill"
+     ]
+    },
+    {
+     "fragment": "frag_wynn_1",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    },
+    {
+     "fragment": "frag_hettie_1",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    },
+    {
+     "fragment": "frag_sweethearts",
+     "weight": 1.0,
+     "areas": [
+      "millbrook_square"
+     ]
+    }
+   ]
+  }
+ },
+ "journal": {
+  "card_style": "sepia vignette with soft burnt edges, painterly, as in concept/ui/journal.png",
+  "locked_card": "blank sepia card with a faint question mark",
+  "set_page": "when all fragments of a set are found, the page shows the owner's face and offers a grave"
+ }
+}

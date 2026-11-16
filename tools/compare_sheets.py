@@ -1,6 +1,7 @@
-"""Side-by-side comparisons of the task3 island renders with the concept art.
+"""Side-by-side comparisons of the island renders with the concept art.
 
-python tools/compare_sheets.py   -> renders/task3/compare_<camera>_<mood>.jpg (concept left, render right)
+python tools/compare_sheets.py               -> renders/task3/compare_<camera>_<mood>.jpg (concept left, render right)
+python tools/compare_sheets.py --task task4  -> renders/task4/compare_<camera>_<mood>.jpg (populated renders)
 """
 import os
 import re
@@ -10,13 +11,15 @@ from PIL import Image, ImageDraw
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, os.path.join(ROOT, 'blender', 'scripts'))
-OUT = os.path.join(ROOT, 'renders', 'task3')
+TASK = sys.argv[sys.argv.index('--task') + 1] if '--task' in sys.argv else 'task3'
+OUT = os.path.join(ROOT, 'renders', TASK)
+SRC = {'task3': 'build_island.py', 'task4': 'population_render.py'}[TASK]
 H = 720
 
 
 def cameras():
-    """Read CAMERAS from build_island.py without importing Blender."""
-    src = open(os.path.join(ROOT, 'blender', 'scripts', 'build_island.py'), encoding='utf-8').read()
+    """Read CAMERAS from the builder (build_island.py / population_render.py) without importing Blender."""
+    src = open(os.path.join(ROOT, 'blender', 'scripts', SRC), encoding='utf-8').read()
     block = src[src.index('CAMERAS = {'):src.index('\n}\n', src.index('CAMERAS = {')) + 2]
     ns = {}
     exec(block, ns)
@@ -41,7 +44,7 @@ def main():
             sheet.paste(b, (a.width + 12, 28))
             d = ImageDraw.Draw(sheet)
             d.text((8, 7), f'concept: {concept}', fill=(230, 225, 240))
-            d.text((a.width + 20, 7), f'render: renders/task3/{name}_{mood}.png', fill=(230, 225, 240))
+            d.text((a.width + 20, 7), f'render: renders/{TASK}/{name}_{mood}.png', fill=(230, 225, 240))
             p = os.path.join(OUT, f'compare_{name}_{mood}.jpg')
             sheet.save(p, quality=88)
             made.append(p)

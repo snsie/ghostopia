@@ -60,9 +60,14 @@ CAMERAS = {
 
 
 # ============================================================================== Blender side
-def blender_main(isl, doc):
+def blender_main(isl, doc, cameras=None, out=None, hook=None, blend_path=None, plan=True):
+    """Build the island scene and render `cameras` (default CAMERAS) to `out` (default renders/task3).
+    `hook(event, ctx, **kw)` is called with 'setup' once the scene, lights and camera exist and with 'shot'
+    (name=, mood=, hour=) before each render, so task4 can add villagers and effects to the same scene."""
     import bpy
     from mathutils import Vector
+    cameras = cameras or CAMERAS
+    OUT = out or globals()['OUT']
 
     t0 = time.time()
     only = set(opt('--only').split(',')) if opt('--only') else None
@@ -487,6 +492,10 @@ def blender_main(isl, doc):
         cam_data.sensor_width = 36
 
     struct = {s['id']: s for s in doc['structures']}
+    ctx = dict(bpy=bpy, sc=sc, cam=cam, place_cam=place_cam, set_mood=set_mood, inst_objs=inst_objs,
+               lights_all=lights_all, prop_coll=prop_coll, hex_rgb=hex_rgb, struct=struct, glow_mats=glow_mats, mist=mist)
+    if hook:
+        hook('setup', ctx)
 
     def cutaway(kind, s):
         """World copy with part of a structure removed + list of instances to hide."""
@@ -554,7 +563,7 @@ def blender_main(isl, doc):
     renders = []
     os.makedirs(OUT, exist_ok=True)
     if '--no-render' not in argv():
-        for name, cd in CAMERAS.items():
+        for name, cd in cameras.items():
             if only and name not in only:
                 continue
             hide = []
@@ -581,6 +590,8 @@ def blender_main(isl, doc):
                 if moods_only and mood not in moods_only:
                     continue
                 p = set_mood(mood)
+                if hook:
+                    hook('shot', ctx, name=name, mood=mood, cd=cd)
                 path = os.path.join(OUT, f'{name}_{mood}.png')
                 t1 = time.time()
                 sc.render.filepath = path
@@ -592,12 +603,15 @@ def blender_main(isl, doc):
                 e.hide_render = False
             if changed:
                 build_chunks(W, changed)
-        if '--no-plan' not in argv() and (not only or 'plan' in only):
+        if plan and '--no-plan' not in argv() and (not only or 'plan' in only):
             render_plan(bpy, sc, cam, cam_data, set_mood, mist, doc)
     if '--no-blend' not in argv():
         set_mood('night')
         place_cam(CAMERAS['millbrook']['pos'], CAMERAS['millbrook']['look'], CAMERAS['millbrook']['lens'])
-        bpy.ops.wm.save_as_mainfile(filepath=os.path.join(ROOT, 'blender', 'millbrook_island.blend'), compress=True)
+        if hook:
+            hook('save', ctx)
+        bpy.ops.wm.save_as_mainfile(filepath=blend_path or os.path.join(ROOT, 'blender', 'millbrook_island.blend'),
+                                    compress=True)
     print(f'blender part done in {time.time() - t0:.1f}s')
     return renders
 
@@ -649,4 +663,5 @@ def main():
     print('DONE')
 
 
-main()
+if __name__ == '__main__':
+    main()

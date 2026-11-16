@@ -281,3 +281,85 @@ Every choice made without asking Scott. Newest sections at the bottom. Later tas
   soft bloom are applied to the saved PNG, since EEVEE has no bloom. Comparison sheets are JPEG.
 - **Cutaways** for the cottage interior (front wall and everything above 3 m removed) and the mill (front of
   the ground floor removed) are render-only; the voxel data is untouched.
+
+## Task 4 conventions (2026-11-16): population data — binding for task5
+- **Files:** `assets/levels/millbrook_population.json` (villagers, schedules, hauntables, nodes, town memory, fx,
+  scare rules, coverage checks) and `assets/data/memory_fragments.json` (owners, sets, fragments, drop tables). Schema in
+  README. Built by `build_population.py` from `lib_population_content.py` (hand-written) + `lib_population.py` (analysis).
+- **Every gameplay number is a placeholder** marked `"tuning": true`. Feel is Scott's.
+- **Schedules** cover one whole cycle from 17:00 to 17:00 with no gaps; each step has clock hours *and* cycle `t`
+  (the layout's 1200 s cycle). A night hour lasts about 71 s, a day hour about 30 s.
+- **Walks are precomputed routes** (A* over standable voxel cells, preferring cobble/packed paths and avoiding furniture
+  and fences; the mill ladder is a vertical link). Godot may follow the waypoints directly or re-path with a navmesh;
+  the waypoints are known to be walkable. Walk speed = 1.2 × the clip's no-slide speed (Godot scales playback to match).
+- **Hauntable ids = layout instance ids.** Extra entries: `source: population` (lanterns, kind `lantern`, Flicker,
+  no HAUNT shell: Godot draws the rim on `INT_lantern` with a shader overlay) and `source: carried` (the candle or
+  lantern in a villager's hand, `carried_by`, ×1.5 Unease).
+- **Held items:** the default item stays in its own hand (`characters.json` `items`); any other item (bucket, broom,
+  lantern, candle) goes in the other hand, placed by the task1 prop pivot hanging below the socket.
+
+## Decisions made during task4 (2026-11-16) — defaults for Scott to change
+- **Villager defaults as the task text gives them:** Widow Agnes (mill) fears **dolls**: her late daughter Elsie's rag
+  doll, named **Button**, on the mill shelf (`cloth_doll_1`). Farmer Bram (east cottage) fears **loud noises**. Wren
+  (tavern maid) fears **the dark**. Schoolteacher Marlow is the **skeptic** (belief 0.15, fears **being alone**, ignores
+  single acts under 10 Unease, breaking her makes a lasting believer with 3× Remembrance). **Pip is a witness, not a
+  target**: can't be scared, sees scares within 18 m (through windows too), legend points ×3, tells Wren and the tavern.
+  **Scott to confirm Pip's witness role.**
+- **Marlow's pronouns are she/her** in the data, to match the task2 teacher model (bun, long skirt). The task text
+  calls Marlow "him"; it is one field (`pronouns`) plus her lines if Scott prefers him.
+- **Pip's household:** Pip lives in cottage_a (the cottage interior concept, where the child in a nightcap holds a
+  candle) while their parents are away at the market town for the season; cousin Wren looks in on Pip every night
+  on her way home, and Marlow walks Pip home from the tavern. Cute, not cruel. Alternatives for Scott: move a parent
+  villager in (run 2), or give Pip a bed in Wren's cottage.
+- **Wren's home stays cottage_b** (task3). "Wren (tavern)" in the task is her workplace: she sweeps the step at dusk,
+  serves until 22:00, tends the bar, sweeps up alone at 23:00 (vulnerable), snuffs the candles, looks in on Pip and
+  walks home with her lantern after midnight.
+- **Night plans:** dusk chores (Agnes draws water at the well with Pip playing near; Bram in the wheat with his back to
+  the tall stalks; Wren sweeps the tavern step; Marlow reads the charm board), evening at the tavern (four seats
+  assigned), walks home with lights (Agnes with her candle up the north path to the mill; Bram east between the fields
+  with a lantern; Marlow's lone evening walk to the **bridge** and back with a lantern; Wren after midnight), bedtime
+  (relight the hearth or a candle, check the door), late sitters (**Agnes rocks in Josiah's chair until 01:30**, Marlow
+  reads until 01:15), sleep, then simple day plans (mill, fields, tavern, lessons in the square, Pip playing).
+- **Marlow carries a lantern on her night walks.** The concept shows every villager out at night with a light, and an
+  unlit dark figure read wrong in the comparison; it also gives her route a carried Flicker target.
+- **Computed, not hand-set:** `alone` (no awake villager in the same interior, or outdoors within 10 m at the same
+  moment), `facing_away_from` (hiding spots, doors and wardrobes within 9 m more than 100° behind them), `vulnerable`
+  (alone and back to a hiding spot, or flagged in the content), `dark_stretches_m` (outdoor route metres beyond the
+  reach of lantern posts, wall lanterns and lit windows; at dusk, night and dawn only), `crosses: bridge`.
+- **Sleepers** take no Unease until a noise within a hauntable's `noise_radius_m` wakes them (at the nervous stage),
+  and a sleeping villager is no company and no witness.
+- **Haunting levels:** doors and floorboards = Creak (1); candles, oil lamps and lanterns = Flicker (2); rocking chair,
+  wardrobe, portrait, bell = Haunted Furniture (3); doll and scarecrow = Possession Puppet (3). Level 3+ is decorative
+  in the slice (`slice_active: false`).
+- **Fear links:** doors play into loud noises (slam) and being alone (drifting open); floorboards, rocking chairs and
+  portraits into being alone; lights into the dark; dolls and the scarecrow into dolls. `candle_1`, the candle Agnes
+  keeps lit beside Button, also counts for **dolls**, so the slice (Flicker) has a way into her fear before the doll
+  itself becomes hauntable at level 3. **Nobody fears mirrors** in the slice: there are no mirror props yet.
+- **Coverage:** every villager has 4–7 level 1–2 hauntables at home and 7–14 on their routes, plus a fear object
+  (checked by the build and the unit test).
+- **Scare rules** (placeholders for task5): Unease stages at 25/45/65/80 % of nerve (glance, "Hello?", clutch the
+  candle, primed), over 100 % = bolt (30 % payout); fear match ×1.75; grade score (primed 1, >90 % 1, fear 2, alone 1,
+  back turned 1, 2 and 3 abilities +1 each, rigged doorway 1): Spooked < 3 ≤ Terrified < 6 ≤ Legendary, so the design
+  plan's Agnes example scores Legendary.
+- **Town memory:** the same trick on the same object twice within 2 nights → that villager hangs their charm there
+  (garlic and lavender, horseshoe, salt vial...), the object is un-hauntable for 3 nights. A botch → salt line across the
+  nearest door (2 nights, rain washes it). Legendary → a tavern rumor and +2 legend points; Pip witnessing ×3; legend
+  name stages from "a draught in Millbrook" to "the {epithet} Ghost of Millbrook", the epithet from the most used trick
+  ("the Creaking Ghost of Millbrook").
+- **Nodes:** weed markers within 2.6 m of a grave are grave weeds (grave moss + fiber), the rest fiber grass. Voxel
+  nodes use the blocks.json drops and tiers (eerie ore tier I, spectral stone and iron tier II). Regrowth in seconds and
+  nights; ore veins re-form only while the area's Remembrance is ≥ 0.5.
+- **Memory fragments:** 30 lines. The three sets of five belong to the worker ghosts' past lives, so completing a set
+  gives that worker a name and a grave: **Hob Ashdown** the blacksmith (faster tool upgrades), **Marigold Finch** the
+  gardener (grave moss, slower weeds), **Ned Ollery** the baker (nearby workers work faster). The other 15 are partial
+  sets for run 2 (Elsie and Josiah Brook, Agnes's daughter and husband; Old Wynn the bell-ringer; Hettie Lark the first
+  schoolmistress) and three strays (the kite child from the mining concept). Each has an emotion for the Memory Loom.
+- **Effects:** smoke from the highest stone column of each house with a hearth (the mill has no hearth or chimney),
+  flames and glows bound by node prefix, fireflies and mist as world boxes, stream sparkle points every ~6 m, spray at
+  each waterfall foot, sails at 3.5 rpm, violet wisps on every exposed eerie-ore face and crystal cluster, the
+  mausoleum portal glow, gravestone wisps, and three worker ghosts (blacksmith, gardener, baker) at graves, hidden by day.
+- **Renders:** the task3 cameras plus `square_close` (villagers are only a few pixels tall in the wide concept framing);
+  each shot poses everyone from their schedule at a fixed hour (night 21:45, dusk 18:30, day 12:00, mill 23:30,
+  cottage 21:30). Effects are Blender stand-ins (spheres); the real particles are Godot's job.
+- **`build_island.blender_main` takes `cameras`, `out`, `hook`, `blend_path`, `plan`** so task4 renders the same scene;
+  its `main()` now runs only as a script. Task3 output is unchanged (rebuilt and diffed).
