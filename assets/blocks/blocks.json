@@ -1,0 +1,1029 @@
+{
+ "version": 1,
+ "tile_size": 64,
+ "atlas": {
+  "albedo": "res://assets/blocks/blocks_atlas.png",
+  "normal": "res://assets/blocks/blocks_normal.png",
+  "height": "res://assets/blocks/blocks_height.png",
+  "emission": "res://assets/blocks/blocks_emission.png",
+  "columns": 8,
+  "rows": 5,
+  "tile_count": 40,
+  "note": "tile index = row*columns + col; import as Texture2DArray with columns x rows slices"
+ },
+ "tile_names": [
+  "grass_top",
+  "grass_side",
+  "dirt",
+  "grave_dirt",
+  "sand",
+  "cobblestone",
+  "spectral_stone",
+  "eerie_ore",
+  "iron_ore",
+  "thatch_side",
+  "thatch_top",
+  "timber_planks",
+  "plaster_wall",
+  "plaster_brace",
+  "plaster_top",
+  "wheat",
+  "grave_moss_top",
+  "grave_moss_side",
+  "gravestone_front",
+  "gravestone_side",
+  "river_water",
+  "still_water",
+  "stone",
+  "mossy_stone_bricks",
+  "timber_beam_side",
+  "timber_beam_end",
+  "slate_side",
+  "slate_top",
+  "rough_wood",
+  "oak_log_side",
+  "oak_log_top",
+  "leaves",
+  "tall_grass",
+  "flowers",
+  "path_top",
+  "cobble_plain",
+  "dirt_top",
+  "sand_top",
+  "grave_dirt_top",
+  "stone_top"
+ ],
+ "faces_note": "tiles: top/bottom/side, optional front (+Z face when the block is placed facing south); directional blocks rotate front toward the placer",
+ "tools": [
+  "none",
+  "scythe",
+  "shovel",
+  "sledgehammer"
+ ],
+ "blocks": [
+  {
+   "id": "air",
+   "index": 0,
+   "name": "Air",
+   "solid": false,
+   "transparent": true,
+   "phaseable": true
+  },
+  {
+   "id": "grass",
+   "name": "Grass",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "shovel",
+   "tier": 1,
+   "hardness": 0.6,
+   "drops": [
+    {
+     "item": "dirt",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    },
+    {
+     "item": "fiber",
+     "min": 1,
+     "max": 1,
+     "chance": 0.3
+    }
+   ],
+   "fragment_chance": 0.02,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 1,
+   "tiles": {
+    "top": 0,
+    "side": 1,
+    "bottom": 36
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "dirt",
+   "name": "Dirt",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "shovel",
+   "tier": 1,
+   "hardness": 0.5,
+   "drops": [
+    {
+     "item": "dirt",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.03,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 2,
+   "tiles": {
+    "top": 36,
+    "side": 2,
+    "bottom": 36
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "grave_dirt",
+   "name": "Graveyard Dirt",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "shovel",
+   "tier": 1,
+   "hardness": 0.6,
+   "drops": [
+    {
+     "item": "grave_dirt",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    },
+    {
+     "item": "bone",
+     "min": 1,
+     "max": 2,
+     "chance": 0.25
+    },
+    {
+     "item": "buried_trinket",
+     "min": 1,
+     "max": 1,
+     "chance": 0.03
+    }
+   ],
+   "fragment_chance": 0.08,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 3,
+   "tiles": {
+    "top": 38,
+    "side": 3,
+    "bottom": 38
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "sand",
+   "name": "Sand",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "shovel",
+   "tier": 1,
+   "hardness": 0.4,
+   "drops": [
+    {
+     "item": "sand",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.02,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 4,
+   "tiles": {
+    "top": 37,
+    "side": 4,
+    "bottom": 37
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "cobblestone",
+   "name": "Cobblestone",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 1,
+   "hardness": 2.0,
+   "drops": [
+    {
+     "item": "cobblestone",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "index": 5,
+   "tiles": {
+    "top": 5,
+    "bottom": 5,
+    "side": 5
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "spectral_stone",
+   "name": "Spectral Stone",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 2,
+   "hardness": 3.0,
+   "drops": [
+    {
+     "item": "spectral_stone",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.1,
+   "light": {
+    "level": 3,
+    "color": "#5af2e6"
+   },
+   "emissive": true,
+   "natural": true,
+   "category": "terrain",
+   "index": 6,
+   "tiles": {
+    "top": 6,
+    "bottom": 6,
+    "side": 6
+   },
+   "tier_name": "II"
+  },
+  {
+   "id": "eerie_ore",
+   "name": "Eerie Ore",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 1,
+   "hardness": 2.5,
+   "drops": [
+    {
+     "item": "eerie_shard",
+     "min": 1,
+     "max": 3,
+     "chance": 1.0
+    },
+    {
+     "item": "spectral_stone",
+     "min": 1,
+     "max": 1,
+     "chance": 0.3
+    }
+   ],
+   "fragment_chance": 0.25,
+   "light": {
+    "level": 6,
+    "color": "#a060ff"
+   },
+   "emissive": true,
+   "natural": true,
+   "category": "ore",
+   "index": 7,
+   "tiles": {
+    "top": 7,
+    "bottom": 7,
+    "side": 7
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "iron_ore",
+   "name": "Iron Ore",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 2,
+   "hardness": 3.5,
+   "drops": [
+    {
+     "item": "iron",
+     "min": 1,
+     "max": 2,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.05,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "ore",
+   "index": 8,
+   "tiles": {
+    "top": 8,
+    "bottom": 8,
+    "side": 8
+   },
+   "tier_name": "II"
+  },
+  {
+   "id": "thatch",
+   "name": "Thatch",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.4,
+   "drops": [
+    {
+     "item": "fiber",
+     "min": 2,
+     "max": 3,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "index": 9,
+   "tiles": {
+    "top": 10,
+    "side": 9,
+    "bottom": 10
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "timber_planks",
+   "name": "Timber Planks",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 1.0,
+   "drops": [
+    {
+     "item": "wood",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "index": 10,
+   "tiles": {
+    "top": 11,
+    "bottom": 11,
+    "side": 11
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "plaster_wall",
+   "name": "Plaster Wall",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.8,
+   "drops": [
+    {
+     "item": "wood",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "index": 11,
+   "tiles": {
+    "side": 12,
+    "top": 14,
+    "bottom": 14
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "plaster_brace",
+   "name": "Braced Plaster Wall",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.8,
+   "drops": [
+    {
+     "item": "wood",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "index": 12,
+   "tiles": {
+    "side": 13,
+    "top": 14,
+    "bottom": 14
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "wheat",
+   "name": "Wheat",
+   "shape": "cross",
+   "solid": false,
+   "phaseable": true,
+   "transparent": true,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.2,
+   "drops": [
+    {
+     "item": "wheat",
+     "min": 1,
+     "max": 2,
+     "chance": 1.0
+    },
+    {
+     "item": "fiber",
+     "min": 1,
+     "max": 1,
+     "chance": 0.5
+    }
+   ],
+   "fragment_chance": 0.02,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "plant",
+   "index": 13,
+   "tiles": {
+    "top": 15,
+    "bottom": 15,
+    "side": 15
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "grave_moss",
+   "name": "Grave Moss",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.5,
+   "drops": [
+    {
+     "item": "grave_moss",
+     "min": 1,
+     "max": 2,
+     "chance": 1.0
+    },
+    {
+     "item": "grave_dirt",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.06,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 14,
+   "tiles": {
+    "top": 16,
+    "side": 17,
+    "bottom": 3
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "gravestone",
+   "name": "Gravestone Block",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 1,
+   "hardness": 3.0,
+   "drops": [
+    {
+     "item": "gravestone",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "graveyard",
+   "directional": true,
+   "index": 15,
+   "tiles": {
+    "front": 18,
+    "side": 19,
+    "top": 22,
+    "bottom": 22
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "river_water",
+   "name": "River Water",
+   "shape": "cube",
+   "solid": false,
+   "phaseable": false,
+   "transparent": true,
+   "liquid": true,
+   "running_water": true,
+   "tool": "none",
+   "tier": 1,
+   "hardness": -1,
+   "drops": [],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "liquid",
+   "index": 16,
+   "tiles": {
+    "top": 20,
+    "bottom": 20,
+    "side": 20
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "still_water",
+   "name": "Still Water",
+   "shape": "cube",
+   "solid": false,
+   "phaseable": false,
+   "transparent": true,
+   "liquid": true,
+   "running_water": false,
+   "tool": "none",
+   "tier": 1,
+   "hardness": -1,
+   "drops": [],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "liquid",
+   "index": 17,
+   "tiles": {
+    "top": 21,
+    "bottom": 21,
+    "side": 21
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "stone",
+   "name": "Stone",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 1,
+   "hardness": 2.5,
+   "drops": [
+    {
+     "item": "cobblestone",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.03,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 18,
+   "tiles": {
+    "top": 39,
+    "side": 22,
+    "bottom": 39
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "mossy_stone_bricks",
+   "name": "Mossy Spectral Bricks",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 2,
+   "hardness": 3.0,
+   "drops": [
+    {
+     "item": "mossy_stone_bricks",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "build_tier": 2,
+   "index": 19,
+   "tiles": {
+    "top": 23,
+    "bottom": 23,
+    "side": 23
+   },
+   "tier_name": "II"
+  },
+  {
+   "id": "timber_beam",
+   "name": "Timber Beam",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 1.2,
+   "drops": [
+    {
+     "item": "wood",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "index": 20,
+   "tiles": {
+    "side": 24,
+    "top": 25,
+    "bottom": 25
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "slate_roof",
+   "name": "Slate Roof",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 1,
+   "hardness": 1.5,
+   "drops": [
+    {
+     "item": "slate_roof",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "index": 21,
+   "tiles": {
+    "top": 27,
+    "side": 26,
+    "bottom": 26
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "rough_wood",
+   "name": "Rough Wood",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.8,
+   "drops": [
+    {
+     "item": "wood",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "build_tier": 1,
+   "index": 22,
+   "tiles": {
+    "top": 28,
+    "bottom": 28,
+    "side": 28
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "oak_log",
+   "name": "Oak Log",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 1.5,
+   "drops": [
+    {
+     "item": "wood",
+     "min": 2,
+     "max": 3,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.03,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 23,
+   "tiles": {
+    "top": 30,
+    "bottom": 30,
+    "side": 29
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "leaves",
+   "name": "Leaves",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": true,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.2,
+   "drops": [
+    {
+     "item": "fiber",
+     "min": 1,
+     "max": 1,
+     "chance": 0.4
+    }
+   ],
+   "fragment_chance": 0.01,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 24,
+   "tiles": {
+    "top": 31,
+    "bottom": 31,
+    "side": 31
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "tall_grass",
+   "name": "Grave Weeds",
+   "shape": "cross",
+   "solid": false,
+   "phaseable": true,
+   "transparent": true,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.2,
+   "drops": [
+    {
+     "item": "fiber",
+     "min": 1,
+     "max": 2,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.03,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "plant",
+   "index": 25,
+   "tiles": {
+    "top": 32,
+    "bottom": 32,
+    "side": 32
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "flowers",
+   "name": "Wildflowers",
+   "shape": "cross",
+   "solid": false,
+   "phaseable": true,
+   "transparent": true,
+   "liquid": false,
+   "running_water": false,
+   "tool": "scythe",
+   "tier": 1,
+   "hardness": 0.2,
+   "drops": [
+    {
+     "item": "flower",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.04,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "plant",
+   "index": 26,
+   "tiles": {
+    "top": 33,
+    "bottom": 33,
+    "side": 33
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "packed_path",
+   "name": "Packed Path",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": true,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "shovel",
+   "tier": 1,
+   "hardness": 0.6,
+   "drops": [
+    {
+     "item": "dirt",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.02,
+   "light": null,
+   "emissive": false,
+   "natural": true,
+   "category": "terrain",
+   "index": 27,
+   "tiles": {
+    "top": 34,
+    "side": 2,
+    "bottom": 36
+   },
+   "tier_name": "I"
+  },
+  {
+   "id": "cobble_path",
+   "name": "Cobbled Path",
+   "shape": "cube",
+   "solid": true,
+   "phaseable": false,
+   "transparent": false,
+   "liquid": false,
+   "running_water": false,
+   "tool": "sledgehammer",
+   "tier": 1,
+   "hardness": 2.0,
+   "drops": [
+    {
+     "item": "cobblestone",
+     "min": 1,
+     "max": 1,
+     "chance": 1.0
+    }
+   ],
+   "fragment_chance": 0.0,
+   "light": null,
+   "emissive": false,
+   "natural": false,
+   "category": "building",
+   "index": 28,
+   "tiles": {
+    "top": 35,
+    "bottom": 35,
+    "side": 35
+   },
+   "tier_name": "I"
+  }
+ ]
+}
