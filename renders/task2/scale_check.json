@@ -1,0 +1,105 @@
+{
+ "sizes": {
+  "villager_widow": {
+   "height_m": 1.536,
+   "width_x_m": 0.625,
+   "depth_y_m": 0.677,
+   "bottom_z": 0.002,
+   "top_z": 1.538
+  },
+  "villager_farmer": {
+   "height_m": 1.878,
+   "width_x_m": 0.983,
+   "depth_y_m": 0.802,
+   "bottom_z": -0.011,
+   "top_z": 1.868
+  },
+  "ghost": {
+   "height_m": 0.641,
+   "width_x_m": 0.494,
+   "depth_y_m": 0.449,
+   "bottom_z": 0.959,
+   "top_z": 1.6
+  },
+  "villager_maid": {
+   "height_m": 1.665,
+   "width_x_m": 0.649,
+   "depth_y_m": 0.55,
+   "bottom_z": 0.002,
+   "top_z": 1.667
+  },
+  "villager_teacher": {
+   "height_m": 1.807,
+   "width_x_m": 0.583,
+   "depth_y_m": 0.528,
+   "bottom_z": 0.0,
+   "top_z": 1.807
+  },
+  "villager_child": {
+   "height_m": 1.232,
+   "width_x_m": 0.449,
+   "depth_y_m": 0.689,
+   "bottom_z": 0.011,
+   "top_z": 1.243
+  },
+  "worker_blacksmith": {
+   "height_m": 0.516,
+   "width_x_m": 0.393,
+   "depth_y_m": 0.325,
+   "bottom_z": -0.03,
+   "top_z": 0.486
+  },
+  "worker_gardener": {
+   "height_m": 0.515,
+   "width_x_m": 0.51,
+   "depth_y_m": 0.505,
+   "bottom_z": -0.03,
+   "top_z": 0.485
+  },
+  "worker_baker": {
+   "height_m": 0.615,
+   "width_x_m": 0.32,
+   "depth_y_m": 0.32,
+   "bottom_z": -0.03,
+   "top_z": 0.585
+  }
+ },
+ "checks": {
+  "villager_widow": {
+   "fits_door_height_2m": true,
+   "fits_door_width_1m": true,
+   "under_3m_ceiling": true
+  },
+  "villager_farmer": {
+   "fits_door_height_2m": true,
+   "fits_door_width_1m": true,
+   "under_3m_ceiling": true
+  },
+  "villager_maid": {
+   "fits_door_height_2m": true,
+   "fits_door_width_1m": true,
+   "under_3m_ceiling": true
+  },
+  "villager_teacher": {
+   "fits_door_height_2m": true,
+   "fits_door_width_1m": true,
+   "under_3m_ceiling": true
+  },
+  "villager_child": {
+   "fits_door_height_2m": true,
+   "fits_door_width_1m": true,
+   "under_3m_ceiling": true
+  },
+  "ghost_hover_1m": {
+   "ghost_bottom_z": 0.959,
+   "ghost_top_z": 1.6,
+   "villager_hip_heights": {
+    "villager_child": 0.42,
+    "villager_farmer": 0.74,
+    "villager_maid": 0.7,
+    "villager_teacher": 0.78,
+    "villager_widow": 0.62
+   }
+  }
+ }
+}

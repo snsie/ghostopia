@@ -27,3 +27,35 @@ Problems hit during the tasks and the workaround used. Newest at the bottom.
   `Condition "f.is_null()" is true. Continuing.` with no file name. The next runs, including a forced
   reimport of a prop, were clean, and all 84 props + textures + atlases have import files. Treated as
   a transient issue during the mass reimport. If it comes back in task5, run the import twice.
+
+## Task 2 (2026-11-16)
+
+- Blender 5.2 has no `Action.fcurves`; keys are written with `action.fcurve_ensure_for_datablock()` and
+  `keyframe_points.foreach_set` (fast, slot-aware). `hasattr(bpy.types.Action, ...)` reports False, but
+  the method exists on instances.
+- The auto pelvis-drop solver first took the wrong root of its quadratic and sank villagers into the
+  floor in every standing clip. Fixed (smallest non-negative root); verified on the strips.
+- Hair caps (full ellipsoids) hid the eyes on four villagers, and the widow's bun sat in front of her
+  forehead. Hair caps are now shells with the face cut out.
+- Face features were projected radially from the head centre, which squeezed every offset toward the
+  middle: eyes too close, mouth hidden behind the nose. They are now placed exactly on the ellipsoid.
+- Gait periods of 0.8 s / 0.7 s / 0.58 s are not whole frames at 24 fps (19.2, 33.6, 13.9 frames), so
+  those loops would hitch. Every gait cycle is now snapped to whole frames, and the no-slide speeds are
+  computed from the snapped period.
+- Preview: blended transparency on the ghost sheet sorted faces badly (half the body darker). Previews
+  use an opaque fresnel-rim stand-in; the exported material keeps alpha 0.86 for Godot.
+- The glTF importer (used by `char_lineup.py`) adds a parentless 2 m bone-shape mesh, which wrecked
+  the measured sizes; the lineup ignores parentless meshes.
+- Godot warned "UVs are required to generate tangents" for the face meshes and the manifest holder;
+  both now get a UV layer.
+- The first headless import after the full build printed the known transient
+  `Condition "f.is_null()" is true` (3–7×), as in task 1; the second import is clean. During the mass
+  import Godot also regenerated the UIDs of `brass.png` and `canvas.png` (committed as Godot wrote them).
+- `taskkill /IM blender.exe` to stop a cancelled build was refused by the permission system, rightly,
+  because another Blender (Scott's) was running. TaskStop had already ended the build.
+- Task 1 committed `blender/scripts/__pycache__/*.pyc`. They are untracked now (`.gitignore` has
+  `__pycache__/`); the files stay on disk.
+- Task1 spectral tools are 0.9–1.1 m long, so they are long for a 0.6 m ghost (the gathering board
+  shows them at about 1.2–1.5× the ghost's height). The tool clips work with them, but the butt of the
+  shovel and scythe dips below the ghost's hem when it hovers low. If Scott wants concept-sized tools,
+  scale the tool glTFs ~0.75 in task5 (the GRIP offsets scale with them).

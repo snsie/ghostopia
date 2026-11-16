@@ -143,3 +143,83 @@ Every choice made without asking Scott. Newest sections at the bottom. Later tas
 - Rebuild order is textures → block textures → props → structures → style check. The task text says
   structures before props; the structure JSON doesn't depend on props, but the structure previews
   stamp the real prop glTFs, so props go first.
+
+## Task 2 conventions (2026-11-16): characters — binding for task3–task5
+
+### Files and nodes
+- One glTF Separate per character in `assets/characters/<name>.gltf` (+ `.bin`, textures shared from
+  `assets/textures/`), plus `assets/characters/characters.json` (size, bones, nodes, expressions, clips with
+  frame counts and loop flags, no-slide speeds, item clips, events). Built by `build_characters.py`.
+- Names: `ghost`, `worker_blacksmith|gardener|baker`, `villager_widow|farmer|maid|teacher|child`.
+  Nodes per character: `<name>_rig` (skeleton), `<name>_body` (skinned body + clothes), `<name>_face` or
+  `ghost_eyes` (shape keys), `<name>_hat` (villagers with a hat, skinned rigidly to the `hat` bone),
+  `HELD_*` sockets, `ITEM_*` held items under them, `MATERIAL_manifest` (ghost only).
+- Pivot = centre of the base on the ground, front = Godot +Z (as task1). The ghost's pivot is the
+  bottom of its hem; Godot floats it by placing the pivot.
+- 24 fps, one glTF animation per clip with the short names from task2.md, **no root motion**. Loop
+  flags live in `characters.json` (`clips.<name>.loop`); Godot sets `loop_mode` from it at load.
+- Glb would duplicate textures; Separate keeps the task1 rule.
+
+### Skeletons
+- Villagers share one 21-bone skeleton (same names and hierarchy, per-villager proportions):
+  `root hips spine chest neck head hat shoulder_L/R upperarm_L/R forearm_L/R hand_L/R thigh_L/R shin_L/R
+  foot_L/R`. `hat` is a bone (not in the ~20 of the task text) so the hat is a separate mesh that the
+  big_scare_leap animation can throw off; hatless villagers keep the bone unused.
+- Ghost skeleton (13 bones): `root body chest head upperarm_L/R forearm_L/R hand_L/R hem_F hem_BL hem_BR`.
+  Worker ghosts use the same skeleton at 0.75 scale.
+- Animations are baked per character by code (rotations as world-axis deltas, analytic two-bone IK,
+  foot-planted gait), so each glTF carries clips that fit its own proportions.
+
+### Held items
+- `HELD_tool` (ghost, right palm), `HELD_R` / `HELD_L` (villagers and workers), `HELD_block` (workers,
+  above the head for `carry`). At rest every socket's axes equal the character frame (Godot +Y up,
+  +Z forward), so an item attached with identity rotation stands upright and faces forward.
+- Godot attaches an item by placing the item's `GRIP` node (task1 tools) on the socket; items without
+  a `GRIP` are placed by their pivot. Built-in villager items (`ITEM_candle`, `ITEM_lantern`,
+  `ITEM_pitchfork`, `ITEM_book`, `ITEM_doll`) already sit with their grip on the socket.
+- `characters.json` lists per villager the `item_clips` that show the default item; Godot hides the
+  `HELD_*` children in all other clips (or swaps in a broom / tray for sweep / serve_drinks).
+- The candle and lantern keep task1's `INT_`/`FLAME_`/`LIGHT_`/`FX_` nodes, so Flicker can snuff the
+  candle a villager is carrying. The lantern drop and hat-off moments of `big_scare_leap` are in
+  `characters.json` `events` (frame numbers) for Godot to spawn physics props.
+
+### Ghost materials and expressions
+- `GHOST_sheet` (translucent white, pale ice-blue emission) is the normal state; `GHOST_manifest`
+  (opaque, brighter) lives on the hidden `MATERIAL_manifest` triangle. Godot hides that node at load and
+  sets it as `ghost_body`'s surface override when the living can see the ghost. The ice-blue fresnel rim
+  is a Godot shader job (previews use a Blender fresnel stand-in, as task1 did for the haunt glow).
+- Ghost eyes: shape keys `angry scared happy closed` (basis = calm). Villager face: `uneasy scared
+  terrified relieved asleep` (basis = calm). `asleep` is an extra key for the sleep loop.
+- Ghost arms are hidden by scaling `upperarm_*` to 0.04 inside the sheet; clips pop them out.
+
+### Markers the clips assume
+- `sit`, `rock_in_chair`: pivot on the seat surface (`MARK_sit`), feet reach 0.48 m down. The rocking
+  chair's own rocking is its `INT_` node; the villager adds a matching body sway (period 2.5 s).
+- `sleep`: pivot on the mattress (`MARK_sleep`, yaw 180 on the bed); the villager lies on the back,
+  head toward its facing direction, so it lands on the pillow.
+
+## Decisions made during task2 (2026-11-16)
+- **All animation made in Blender by code; nothing downloaded.** The foot-planted gait has no sliding
+  (planted-foot speed error ≤ 0.5 mm/s, checked numerically), and the key-pose clips read clearly on
+  the strips, so the CC0 fallback was not needed.
+- **Every villager gets all 20 shared clips**, including `rock_in_chair` and the three work loops, since
+  they cost nothing on the shared skeleton and give task4 freedom (e.g. the maid can sweep). The intended
+  owners are: widow `rock_in_chair` + `sweep`, farmer `work_field`, maid `serve_drinks`.
+- **Hold styles per villager** change the arms in idle/walk-type clips (widow: candle held at the
+  chest in both hands; farmer: pitchfork upright; maid: lantern hanging, other hand at the chest; teacher:
+  one arm crossed, book against the chest; child: doll hugged). Clip names stay shared.
+- **Child wears a nightcap** (from `cottage_interior_night.png`), which gives the child a hat node too.
+  The teacher has no hat (her bun is hair).
+- **Teacher's held item is the book**, with the satchel on her hip; the potion-like vial on
+  villagers.png is a salt vial (a folklore charm), not a potion.
+- **Proportions:** chunky heads about 1/4 of the height (child about 1/3), short legs, mitten hands.
+  Heights: widow 1.50, farmer 1.74 (+hat), maid 1.60, teacher 1.68, child 1.10 m.
+- **Faces are geometry, not texture swaps** (eye/brow/mouth/cheek patches on the head with shape keys),
+  so expressions stay crisp at any distance and blend smoothly inside clips.
+- **Ghost T-pose rest** keeps the arms out (as on basic ghosts.png); every clip scales them in or out.
+- **Ghost tool clips use the tier I tool lengths** for the two-hand IK. Higher tiers are a few cm longer;
+  the left hand lands within reach of `GRIP_off`.
+- **Worker ghosts are 0.75 × the player ghost** (0.51–0.61 m with hats) and bean-shaped, as on
+  worker_ghosts.png.
+- **Previews show frame 0 of the idle clip** in the turnarounds (the rest pose is the A/T-pose), plus
+  an expression sheet per character.

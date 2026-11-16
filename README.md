@@ -49,6 +49,21 @@ Contact sheets (system Python + Pillow) are made with `tools/contact_sheet.py`, 
 python tools/contact_sheet.py renders/task1/props_hauntable.png --cols 6 --cell 260 renders/task1/props/{door_cottage,candle,wardrobe}.png
 ```
 
+### Task 2: characters (about 4 minutes in total, most of it preview rendering)
+
+```bash
+"$B" -b --factory-startup -P blender/scripts/build_characters.py      # assets/characters/*.gltf + characters.json + blender/characters.blend + renders/task2/
+"$B" -b --factory-startup -P blender/scripts/char_lineup.py           # renders/task2/lineup_*.png + scale_check.json (imports the exported glTFs)
+/c/Tools/Godot/godot_console.exe --headless --path . --import         # re-import into Godot
+```
+
+Options: `build_characters.py -- --only ghost,villager_farmer`, `-- --clips idle,walk` (re-render only these
+strips), `-- --no-strips`, `-- --no-render`. The builder calls `python tools/char_sheets.py <names>` at the end,
+which turns the per-frame previews in `renders/task2/frames/` (gitignored) into the committed sheets
+`renders/task2/<name>_turnaround.png` and `renders/task2/<name>_anims.png`. Code: `lib_char.py` (skeleton,
+lofts, skinning, face shape keys, FK/IK pose solver, NLA baking, export), `char_ghost.py` (player and worker
+ghosts), `char_villagers.py` (villagers, items, control poses, foot-planted gait).
+
 The committed sheets in `renders/task1/` are: `block_tiles`, `blocks_studio`, `blocks_night`,
 `prop_textures`, `props_<category>`, `hauntables_normal_vs_haunted`, `structures_{day,night,interiors}`
 and `style_check_*`. The per-item frames in `renders/task1/props/` and `renders/task1/structures/` are
