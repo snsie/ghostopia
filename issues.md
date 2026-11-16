@@ -59,3 +59,20 @@ Problems hit during the tasks and the workaround used. Newest at the bottom.
   shows them at about 1.2–1.5× the ghost's height). The tool clips work with them, but the butt of the
   shovel and scythe dips below the ghost's hem when it hovers low. If Scott wants concept-sized tools,
   scale the tool glTFs ~0.75 in task5 (the GRIP offsets scale with them).
+
+## Task 3 (2026-11-16)
+
+- A world volume (Principled Volume on the world output) for distance fog swallowed most of the ambient
+  light in EEVEE: the night render went almost black except near lanterns. The preview now has only a thin
+  low-mist volume slab; distance fog is Godot's job (the presets carry it).
+- Freestyle ink with task1's colour came out as light lines on the night scene; the island build sets a near
+  black ink colour.
+- The first run placed the wheat field fence through Wren's cottage, a barrel and a lamp post inside walls, a
+  graveyard fence through the ore outcrop and a lantern post floating over a terrace. Fixed in the layout; the
+  new `tests/test_island.gd` checks that every standalone prop and outdoor marker stands on open ground.
+- The glTF importer prints many `edge … appears twice, correcting` warnings while importing the task1 props.
+  Harmless (meshes import fine); left as is.
+- EEVEE reports `Shadow buffer full (2101 / 2048)` on the wide Millbrook and overview views (about 100 point
+  lights from candles and lanterns). Shadows of a few small lights may drop in those previews; no effect on
+  the data.
+- No bloom in EEVEE any more; a numpy bloom on the saved PNG stands in for Godot's glow.

@@ -223,3 +223,61 @@ Every choice made without asking Scott. Newest sections at the bottom. Later tas
   worker_ghosts.png.
 - **Previews show frame 0 of the idle clip** in the turnarounds (the rest pose is the A/T-pose), plus
   an expression sheet per character.
+
+## Task 3 conventions (2026-11-16): level data — binding for task4–task5
+- **Level files:** `assets/levels/millbrook_layout.json` + `millbrook_voxels.bin` (schema in README "Level data").
+  World origin = cell (0, 0, 0) corner; Godot axes and metres as everywhere else.
+- **Voxel file:** gzip of `u8` block indices from `blocks.json` (0 = air), order **x fastest, then z, then y**,
+  the same order as blueprint RLE. 192 × 48 × 192 cells, chunk size 16. The voxels already contain every
+  stamped structure; `structures` in the JSON only describes them.
+- **Marker ids** are `<kind>_<resident or place>[_<detail>]`. Residents: `agnes` (windmill), `pip`
+  (cottage_a), `marlow` (cottage_c), `wren` (cottage_b), `bram` (cottage_d). Structure instance ids:
+  `mausoleum`, `graveyard_gate`, `windmill`, `pip_cottage`, `marlow_cottage`, `wren_cottage`, `bram_cottage`,
+  `tavern`, `well`, `bridge`. Blueprint markers are renamed (sit → `chair_*`, sleep → `bed_*`, hide →
+  `hiding_spot_*`, spawn_villager → `villager_home_*`) and keep their origin in `source`.
+- **Lighting presets live in the layout JSON** and the Blender previews render from them, so Godot and the
+  previews share one definition. `direction` is the vector the light travels (Godot DirectionalLight3D
+  looks down its −Z: point −Z along it). Energies are Godot units (the preview multiplies by about 3).
+- **Day/night cycle (tuning):** 1200 s; night gets half the cycle (inverted day): dusk → night (t 0.08–0.58)
+  → dawn → day (0.70–0.94) → dusk. A `dawn` preset was added for the transition.
+- **Export note for task5:** `.bin` and `.json` under `assets/levels/` are not Godot resources; the export
+  presets must include them (`include_filter` `*.json, *.bin`).
+
+## Decisions made during task3 (2026-11-16)
+- **Graveyard in the west**, as the task text and `world_map.png` say. `millbrook_empty.png` paints the
+  graveyard hill upper right of a view that otherwise looks north (windmill upper left, fields lower right),
+  so in the Millbrook render the graveyard is off-frame to the left. Everything else follows
+  `millbrook_empty.png`: the stream runs on the **west** side of the village with the tavern on its east
+  bank, the bridge south-west of the square on the main path, the mill on a rise to the north-west.
+- **Fields south-east of the square** (wheat behind, pumpkins in front, as in the lit Millbrook images'
+  lower right); Bram's cottage beyond them in the east.
+- **Homes:** cottage_a (the interior concept) is Pip's, Marlow's is the narrow cottage_c by the square,
+  Wren's is cottage_b facing the square from the east (task4 has her walking home from the tavern),
+  Bram's is the farmer's cottage_d by the fields, Agnes lives in the mill. The tavern has no resident.
+  A child living alone is odd; task4 can move a guardian in or treat Pip as staying with Wren.
+- **Island:** round-ish (radius 84 ± 4, wobbly), 192 × 192 world; the playable surface is y 20–27 (village
+  top block 20, mill rise 26, graveyard plateau 27, north highland 24); a deep keel underneath (bottom at
+  y 1 in the middle, thin at the rim) of stone, spectral stone and eerie-ore streaks; 260 floating cubes
+  past the crumbling rim. North highland terraces down to the village, so the stream has two waterfalls
+  above the village and two small drops south of it, then falls off the south rim.
+- **Distances:** the path from the mausoleum door to the square is about 102 m (stairs included):
+  46 s at 2.2 m/s, about 30–40 s at the ghost's 2.5–4 m/s drift. Close to the task's ~45 s; the layout
+  constants at the top of `lib_island.py` move zones if Scott wants it tighter.
+- **Stream:** 3 wide, two cells deep, surface one block below the banks (the bridge blueprint assumes
+  that), sand bed, sand/grass/stone banks. Water cells carry a flow vector and a waterfall flag.
+- **Hiding spots:** wardrobes (from the blueprints), beside the bridge abutments (the deck sits right on
+  the water, so there is no room under it), behind the tavern barrels, the well, the charm board, in the
+  wheat, behind the dead tree and the mill's grain sacks.
+- **Shelters:** the mausoleum crypt plus three small caves (graveyard hill, mill rise, a sinkhole in the
+  south forest), each ending in a chamber with eerie and iron ore on the walls.
+- **Ore nodes** are exposed ore blocks with a floor below the open side (the underside streaks don't
+  count): the graveyard outcrop and cave walls. Hidden ore pockets (iron in stone y 5–17, eerie ore in
+  spectral stone y ≤ 11) are plain voxels to dig for.
+- **The square** mixes cobble path and cobblestone blocks, with a ring of grass and flowers round the well
+  (concept). Village lawns get no weeds within 30 m of the square, only flower clumps.
+- **Renders:** voxels are meshed per 32 × 32 chunk with hidden faces culled (equivalent to instanced cubes,
+  and fast: ~104k faces); props are collection instances of the task1 glTFs. EEVEE + Freestyle ink lines,
+  ink colour darkened for the island (task1's ink reads light on a dark night scene). Saturation and a
+  soft bloom are applied to the saved PNG, since EEVEE has no bloom. Comparison sheets are JPEG.
+- **Cutaways** for the cottage interior (front wall and everything above 3 m removed) and the mill (front of
+  the ground floor removed) are render-only; the voxel data is untouched.
