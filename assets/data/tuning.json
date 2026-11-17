@@ -1,0 +1,254 @@
+{
+  "_note": "Every feel number of the vertical slice lives here (task5). Edit and restart; no code changes needed. Villager personalities (belief, nerve, fear, lines) stay in millbrook_population.json; 'villager_overrides' below can override any of their numbers by id.",
+  "version": 1,
+
+  "cycle": {
+    "_note": "Inverted day. The layout's cycle keys (t in [0,1)) are kept; only the real length changes. Night = t 0.08-0.58 = half the cycle, so 1440 s gives a 12-minute night.",
+    "length_s": 1440,
+    "start_t": 0.06,
+    "dawn_warning_t": 0.555,
+    "autosave_at_dawn": true,
+    "sleep_skip_to_t": 0.95,
+    "sleep_fade_s": 1.2
+  },
+
+  "player": {
+    "hp_base": 10,
+    "ecto_max": 100,
+    "ecto_regen_per_s": 3.0,
+    "move_speed_mps": 3.2,
+    "fast_speed_mps": 5.2,
+    "accel": 9.0,
+    "hover_height_m": 1.05,
+    "hover_spring": 4.0,
+    "glide_down_mps": 1.4,
+    "ascend_mps": 2.6,
+    "ascend_ecto_per_s": 14.0,
+    "ascend_max_above_ground_m": 9.0,
+    "sink_mps": 2.2,
+    "radius_m": 0.28,
+    "height_m": 0.62,
+    "reach_m": 4.5,
+    "daylight_drain_hp_per_s": 0.16,
+    "dawn_drain_mult": 0.5,
+    "shelter_needs_natural_blocks_above": 2,
+    "scatter_drop_fraction": 0.35,
+    "scatter_time_s": 2.5,
+    "respawn_hp_fraction": 1.0,
+    "hurt_flash_every_s": 1.5
+  },
+
+  "camera": {
+    "distance_m": 3.4,
+    "distance_indoor_m": 1.6,
+    "height_m": 0.9,
+    "pitch_min_deg": -70,
+    "pitch_max_deg": 55,
+    "mouse_sensitivity": 0.0028,
+    "stick_sensitivity_deg_s": 160,
+    "zoom_lerp": 6.0,
+    "boo_punch_in_m": 1.3,
+    "fov": 70
+  },
+
+  "presence": {
+    "_note": "Shared level fed by all Fright. Raises HP, scare (BOO) radius and manifest time.",
+    "levels": [
+      {"level": 1, "fright": 0,   "hp": 10, "scare_radius_m": 4.0, "manifest_s": 1.6},
+      {"level": 2, "fright": 60,  "hp": 12, "scare_radius_m": 4.6, "manifest_s": 2.0},
+      {"level": 3, "fright": 160, "hp": 14, "scare_radius_m": 5.2, "manifest_s": 2.4},
+      {"level": 4, "fright": 320, "hp": 16, "scare_radius_m": 5.8, "manifest_s": 2.8},
+      {"level": 5, "fright": 560, "hp": 18, "scare_radius_m": 6.4, "manifest_s": 3.2}
+    ]
+  },
+
+  "haunting": {
+    "_note": "Haunting path. Level 1 Creak (doors, floorboards), level 2 Flicker (candles, lamps, lanterns). Level 3+ is shown but not playable in the slice.",
+    "levels": [
+      {"level": 1, "fright": 0,   "unlock": "creak",   "name": "Creak"},
+      {"level": 2, "fright": 25,  "unlock": "flicker", "name": "Flicker"},
+      {"level": 3, "fright": 150, "unlock": "haunted_furniture", "name": "Haunted Furniture", "slice_locked": true}
+    ],
+    "range_m": 7.0,
+    "aim_cone_deg": 14.0,
+    "ecto_cost": {"creak": 4, "drift_open": 8, "dim": 5, "snuff": 9},
+    "haunt_glow_s": 1.6,
+    "flicker_reach_m": 7.0,
+    "dim_energy": 0.3,
+    "relight_delay_s": 7.0
+  },
+
+  "scare": {
+    "_note": "Copied from millbrook_population.json scare_rules (task4 placeholders) and extended for task5. This file wins.",
+    "belief_floor": 0.4,
+    "fear_match_mult": 1.75,
+    "skeptic_ignores_acts_below": 10,
+    "decay_delay_s": 6.0,
+    "decay_mult": 1.0,
+    "stages": [
+      {"id": "calm",    "from": 0.0,  "clip": null,                 "walk": "walk",               "expression": "calm"},
+      {"id": "uneasy",  "from": 0.25, "clip": "look_over_shoulder", "walk": "walk",               "expression": "uneasy"},
+      {"id": "nervous", "from": 0.45, "clip": "call_out",           "walk": "walk_uneasy",        "expression": "uneasy", "line": "Hello? Who's there?"},
+      {"id": "scared",  "from": 0.65, "clip": "startle",            "walk": "clutch_candle_walk", "expression": "scared"},
+      {"id": "primed",  "from": 0.8,  "clip": null,                 "walk": "clutch_candle_walk", "expression": "terrified"}
+    ],
+    "overflow_at": 1.0,
+    "bolt_fright_mult": 0.3,
+    "noise_falloff": 0.5,
+    "light_act_radius_m": 7.0,
+    "carried_light_mult": 1.5,
+    "combo_window_s": 45.0,
+    "boo": {
+      "ecto_cost": 20,
+      "cooldown_s": 3.0,
+      "needs_stage": "primed",
+      "spotted_cone_deg": 70.0,
+      "spotted_range_m": 7.0,
+      "slowmo_s": 0.6,
+      "slowmo_scale": 0.3,
+      "punch_in_s": 1.0
+    },
+    "vulnerable": {"alone_radius_m": 10.0, "facing_away_deg": 100.0, "doorway_radius_m": 2.2},
+    "grade_score": {
+      "primed": 1,
+      "unease_over_0_9": 1,
+      "fear_match": 2,
+      "alone": 1,
+      "back_turned": 1,
+      "two_abilities": 1,
+      "three_abilities": 1,
+      "rigged_doorway": 1,
+      "three_objects": 1
+    },
+    "grades": [
+      {"id": "spooked",   "name": "Spooked",   "min_score": 0},
+      {"id": "terrified", "name": "Terrified", "min_score": 3},
+      {"id": "legendary", "name": "Legendary", "min_score": 6}
+    ],
+    "payout": {
+      "fright":      {"bolt": 4,   "spooked": 10,   "terrified": 25,   "legendary": 60},
+      "remembrance": {"bolt": 0.0, "spooked": 0.02, "terrified": 0.05, "legendary": 0.12},
+      "heat":        {"bolt": 1.0, "spooked": 2.0,  "terrified": 4.0,  "legendary": 6.0, "botch": 3.0}
+    },
+    "suspicion": {"per_act": 0.08, "same_trick_twice_mult": 2.0, "seen_manifesting": 0.5, "decay_per_night": 0.5, "decay_per_s": 0.0015},
+    "botch_bravery_mult": 1.0,
+    "recover_after_break_s": 14.0,
+    "flee_s": 9.0,
+    "wake_unease_fraction": 0.45,
+    "fall_asleep_again_below": 0.2
+  },
+
+  "overhear": {
+    "radius_m": 4.0,
+    "cooldown_s": 14.0,
+    "lines_to_reveal_fear": 3,
+    "bubble_s": 4.5
+  },
+
+  "town_memory": {
+    "repeat_same_object_count": 2,
+    "repeat_within_nights": 2,
+    "charm_unhauntable_nights": 3,
+    "salt_line_nights": 2,
+    "legend_points": {"terrified": 1, "legendary": 2, "believer": 3},
+    "terrified_rumor_chance": 0.35,
+    "witness_mult": 3.0,
+    "witness_radius_m": 18.0,
+    "rumor_heard_within_m": 6.0,
+    "rumor_cooldown_s": 20.0,
+    "max_rumors": 6
+  },
+
+  "remembrance": {
+    "_note": "Per area (task3 areas), 0..1. Decays slowly; scares restore it. Below fading_below the world blends toward the 'fading' look.",
+    "decay_per_s": 0.00012,
+    "min": 0.0,
+    "fading_below": 0.4,
+    "fully_faded_at": 0.1,
+    "believer_mult": 3.0
+  },
+
+  "heat": {
+    "_note": "Tracked and shown only; Ghost Hunters arrive in run 2.",
+    "max": 100,
+    "decay_per_s": 0.01
+  },
+
+  "mining": {
+    "swing_s": 0.42,
+    "hits_per_hardness": 2.0,
+    "min_hits": 1,
+    "tier_speed": [1.0, 1.6, 2.2, 3.0],
+    "fragment_pickup_s": 1.4,
+    "fragment_chance_mult": 1.0,
+    "place_reach_m": 4.5
+  },
+
+  "nodes": {
+    "regrow_mult": 1.0
+  },
+
+  "items": {
+    "_note": "name, kind (tool, block, material), block = the voxel it places",
+    "scythe":        {"name": "Spectral Scythe",       "kind": "tool"},
+    "shovel":        {"name": "Spectral Shovel",       "kind": "tool"},
+    "sledgehammer":  {"name": "Spectral Sledgehammer", "kind": "tool"},
+    "dirt":          {"name": "Dirt",            "kind": "block", "block": "dirt"},
+    "grave_dirt":    {"name": "Graveyard Dirt",  "kind": "block", "block": "grave_dirt"},
+    "sand":          {"name": "Sand",            "kind": "block", "block": "sand"},
+    "cobblestone":   {"name": "Cobblestone",     "kind": "block", "block": "cobblestone"},
+    "spectral_stone":{"name": "Spectral Stone",  "kind": "block", "block": "spectral_stone"},
+    "mossy_stone_bricks": {"name": "Mossy Spectral Bricks", "kind": "block", "block": "mossy_stone_bricks"},
+    "rough_wood":    {"name": "Rough Wood",      "kind": "block", "block": "rough_wood"},
+    "slate_roof":    {"name": "Slate",           "kind": "block", "block": "slate_roof"},
+    "gravestone":    {"name": "Gravestone",      "kind": "block", "block": "gravestone"},
+    "wood":          {"name": "Wood",            "kind": "material"},
+    "fiber":         {"name": "Fiber",           "kind": "material"},
+    "grave_moss":    {"name": "Grave Moss",      "kind": "material"},
+    "bone":          {"name": "Bone",            "kind": "material"},
+    "buried_trinket":{"name": "Buried Trinket",  "kind": "material"},
+    "eerie_shard":   {"name": "Eerie Shard",     "kind": "material"},
+    "iron":          {"name": "Iron",            "kind": "material"},
+    "wheat":         {"name": "Wheat",           "kind": "material"},
+    "flower":        {"name": "Wildflower",      "kind": "material"},
+    "fright_essence":{"name": "Fright Essence",  "kind": "material"}
+  },
+
+  "start": {
+    "tools": {"scythe": 1, "shovel": 1, "sledgehammer": 1},
+    "hotbar": ["scythe", "shovel", "sledgehammer", "", "", "", "", "", ""],
+    "inventory": {"rough_wood": 8}
+  },
+
+  "recipes": [
+    {"id": "scythe_t2",       "name": "Scythe II",       "tool": "scythe",       "tier": 2, "needs": {"wood": 4, "fiber": 6, "eerie_shard": 2}},
+    {"id": "shovel_t2",       "name": "Shovel II",       "tool": "shovel",       "tier": 2, "needs": {"wood": 3, "bone": 2, "eerie_shard": 2}},
+    {"id": "sledgehammer_t2", "name": "Sledgehammer II", "tool": "sledgehammer", "tier": 2, "needs": {"wood": 2, "cobblestone": 4, "eerie_shard": 3}},
+    {"id": "rough_wood",      "name": "Rough Wood x4",   "item": "rough_wood",   "count": 4, "needs": {"wood": 2}},
+    {"id": "mossy_bricks",    "name": "Mossy Bricks x2", "item": "mossy_stone_bricks", "count": 2, "needs": {"spectral_stone": 2, "grave_moss": 1}}
+  ],
+  "workbench_reach_m": 3.0,
+
+  "npc": {
+    "walk_speed_mult": 1.0,
+    "flee_speed_mult": 1.0,
+    "rejoin_speed_mult": 1.25,
+    "door_open_radius_m": 1.3,
+    "turn_lerp": 8.0,
+    "path_max_nodes": 30000
+  },
+
+  "world": {
+    "vertex_jitter_m": 0.035,
+    "lantern_color": "#ffad5c",
+    "candle_color": "#ffb24d",
+    "candle_range_m": 5.0,
+    "lantern_range_m": 8.0,
+    "window_glow_energy": 2.2,
+    "flame_glow_energy": 3.0,
+    "ambient_mult": 0.5,
+    "exposure_mult": 0.85
+  },
+
+  "villager_overrides": {}
+}

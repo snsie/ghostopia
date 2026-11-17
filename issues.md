@@ -98,3 +98,26 @@ Problems hit during the tasks and the workaround used. Newest at the bottom.
   Harmless; the routes are walkable.
 - EEVEE still reports `Shadow buffer full` on the wide views (the villagers' candles and lanterns add lights). Some small
   shadows may drop in the previews; no effect on the data.
+
+## Task 5 (2026-11-17)
+
+- **The background sound agent was stopped** before it put anything in `assets/audio/` (it left about 40 downloads in
+  the scratchpad). All audio was then synthesized by `tools/make_audio.py`, plus ten official Kenney CC0 files.
+- **libsndfile's Vorbis encoder crashed (stack overflow)** when writing 40–60 s files in one call; `make_audio.py` now
+  writes in 4096-frame blocks.
+- **Setting `position` on anchored Controls** put most HUD widgets and the centred screens off-screen in the first run.
+  The HUD now lays itself out from the viewport size every frame. Screens sit in a full-rect `CenterContainer`, set with
+  `set_anchors_and_offsets_preset`.
+- **A carried lantern's `Hauntable` stayed registered after its prop was freed** (on a step change), flooding
+  `previously freed instance` errors. Carried hauntables are now unregistered together with their prop.
+- **New `class_name`s need a `--import`** before `tools/run-tests.sh` sees them (the class cache). The test runner now
+  also fails on any `SCRIPT ERROR` (task4 issue).
+- **Some glTF props print `invalid UID ... using text path instead`** for their textures (UIDs Godot regenerated in
+  task2). Harmless: the textures load by path.
+- **Several mausoleum walls are `spectral_stone_vein` nodes** in the task4 data (ore_node_1..17), so a player can mine
+  the mausoleum apart. Left as is (it's the ghost's home to wreck); the autotest skips them.
+- **Villagers stay small, and the night is cooler and flatter than the concept** (see report_task5.md). The concept's
+  purple trees, horizon ruins and moon framing aren't in the voxel data.
+- **The tour's cottage-interior view can't match the concept's cutaway:** the real walls are there.
+- **Shell heredocs with long Markdown failed to parse again;** the docs were appended through scratch files (as in
+  task1 and task4).

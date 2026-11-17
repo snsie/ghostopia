@@ -1,0 +1,84 @@
+AUTOTEST     0.1s START build {"chunks":254,"faces":100093,"load_ms":2490,"mesh_ms":1937.55,"nodes_ms":179.584,"threads":20,"total_ms":2978}
+AUTOTEST     0.1s PASS world_built chunks=254 faces=100093 mesh_ms=1937.55
+AUTOTEST     0.1s PASS villagers_spawned 5
+AUTOTEST     0.1s PASS hauntables_bound 75
+AUTOTEST     0.6s SHOT 01_title_screen.png
+AUTOTEST     1.8s PASS hover feet 1.05 above ground
+AUTOTEST     1.8s INFO camera spring 3.40 / 3.40 m, pitch -0.25
+AUTOTEST     2.0s SHOT 02_graveyard_night_start.png
+AUTOTEST     3.8s PASS drift moved 5.8 m
+AUTOTEST     4.8s PASS ascend_costs_ecto ecto 100 -> 89
+AUTOTEST     6.8s PASS glide_back_down 
+AUTOTEST     8.9s PASS phase_through_wall z=82.18 (wall at z 85)
+AUTOTEST     9.6s SHOT 03_inside_pip_cottage.png
+AUTOTEST     9.6s PASS camera_pulls_in_indoors 
+AUTOTEST    13.2s PASS stopped_by_stream x=88.28 (water x 85..88)
+AUTOTEST    13.5s SHOT 04_stream_blocks_ghost.png
+AUTOTEST    17.6s PASS cross_bridge x=79.50
+AUTOTEST    18.3s PASS mine_grave_dirt grave_1 -> broke
+AUTOTEST    18.7s PASS mine_grave_weeds weed_1 -> broke
+AUTOTEST    19.2s PASS mine_fiber_grass weed_2 -> broke
+AUTOTEST    20.0s PASS mine_eerie_ore_vein ore_node_18 -> broke
+AUTOTEST    21.3s SHOT 05_mining_eerie_ore.png
+AUTOTEST    23.9s PASS memory_fragment_collected 3 fragments
+AUTOTEST    23.9s INFO topped up for the recipe: {"cobblestone":4,"eerie_shard":1,"wood":2}
+AUTOTEST    24.3s PASS at_workbench 
+AUTOTEST    24.5s SHOT 06_workbench_crafting.png
+AUTOTEST    24.5s PASS craft_tier2 
+AUTOTEST    25.3s PASS mine_spectral_stone_vein_tier2 ore_node_20 -> broke
+AUTOTEST    26.2s PASS mine_iron_ore_vein_tier2 ore_node_37 -> broke
+AUTOTEST    26.7s INFO agnes step agnes_08_rock_in_chair at (100.4, 27.55, 52.5)
+AUTOTEST    27.6s PASS overhear_mutters 3 lines
+AUTOTEST    27.6s PASS fear_discovered dolls
+AUTOTEST    27.8s SHOT 07_overheard_agnes.png
+AUTOTEST    27.8s PASS flicker_locked_at_level1 
+AUTOTEST    27.9s INFO drift_open door: agnes unease 7.5 / 60 (calm)
+AUTOTEST    28.1s SHOT 08_creak_door.png
+AUTOTEST    34.0s INFO creak door: agnes unease 12.8 / 60 (calm)
+AUTOTEST    40.1s INFO drift_open door: agnes unease 20.2 / 60 (uneasy)
+AUTOTEST    46.2s INFO creak door: agnes unease 25.6 / 60 (uneasy)
+AUTOTEST    52.3s INFO drift_open door: agnes unease 33.1 / 60 (nervous)
+AUTOTEST    58.4s INFO creak door: agnes unease 38.5 / 60 (nervous)
+AUTOTEST    64.5s INFO drift_open door: agnes unease 45.9 / 60 (scared)
+AUTOTEST    70.6s INFO creak door: agnes unease 51.3 / 60 (primed)
+AUTOTEST    76.7s PASS creak_raises_unease 8 acts
+AUTOTEST    77.0s SHOT 09_unease_meter_primed.png
+AUTOTEST    77.3s SHOT 10_boo_grade_stamp.png
+AUTOTEST    77.3s PASS boo_graded terrified score 3 ["primed", "alone", "back_turned"]
+AUTOTEST    77.3s PASS fright_paid 25 Fright
+AUTOTEST    78.8s SHOT 11_big_scare_reaction.png
+AUTOTEST    78.9s PASS haunting_level_2 level 2
+AUTOTEST   110.1s PASS flicker_candle agnes unease 52.8 / 60
+AUTOTEST   110.4s SHOT 12_flicker_snuffed.png
+AUTOTEST   110.4s PASS suspicious_villager suspicion 0.69, reactions [0.4]
+AUTOTEST   110.5s PASS second_break legendary score 7 ["primed", "fear_match", "alone", "back_turned", "two_abilities", "three_objects"]
+AUTOTEST   110.6s PASS charm_hung charms door_cottage_1
+AUTOTEST   110.6s PASS legend_grows 3 points, 'the Ghost of Millbrook'
+AUTOTEST   111.9s SHOT 13_charm_on_door.png
+AUTOTEST   112.0s PASS botched_boo botch too_early
+AUTOTEST   112.9s SHOT 14_botch_bram.png
+AUTOTEST   113.5s SHOT 15_millbrook_dusk.png
+AUTOTEST   113.9s SHOT 16_millbrook_night.png
+AUTOTEST   113.9s PASS new_night night 1
+AUTOTEST   113.9s PASS dawn_autosave 
+AUTOTEST   114.3s SHOT 17_millbrook_dawn.png
+AUTOTEST   114.9s SHOT 18_daylight_burns.png
+AUTOTEST   118.2s PASS scattered_by_daylight after 3.5s
+AUTOTEST   118.2s PASS essence_dropped 1 piles
+AUTOTEST   121.0s SHOT 19_scattered_screen.png
+AUTOTEST   121.3s PASS respawn_at_mausoleum 
+AUTOTEST   121.3s PASS shelter_in_mausoleum 
+AUTOTEST   122.9s PASS sleep_skips_day t=0.950
+AUTOTEST   123.7s SHOT 20_hud_square_night.png
+AUTOTEST   123.9s SHOT 21_journal.png
+AUTOTEST   124.1s SHOT 22_inventory_workbench.png
+AUTOTEST   124.4s SHOT 23_pause.png
+AUTOTEST   124.6s SHOT 24_settings.png
+AUTOTEST   124.6s PASS ui_screens 
+AUTOTEST   124.6s PASS save C:/Users/scott/AppData/Roaming/Godot/app_userdata/Ghostopia/save.json
+AUTOTEST   126.4s PASS load_world_edit 
+AUTOTEST   126.4s PASS load_inventory 
+AUTOTEST   126.4s PASS load_fragments_and_legend 
+AUTOTEST   126.4s PASS load_villager_memory 
+AUTOTEST   129.4s PERF avg_fps 111.4 over the village at night, NVIDIA GeForce RTX 5070 Ti
+AUTOTEST   129.4s DONE 46 passed, 0 failed []

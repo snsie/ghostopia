@@ -363,3 +363,92 @@ Every choice made without asking Scott. Newest sections at the bottom. Later tas
   cottage 21:30). Effects are Blender stand-ins (spheres); the real particles are Godot's job.
 - **`build_island.blender_main` takes `cameras`, `out`, `hook`, `blend_path`, `plan`** so task4 renders the same scene;
   its `main()` now runs only as a script. Task3 output is unchanged (rebuilt and diffed).
+
+## Task 5 conventions (2026-11-17): the game — binding for run 2
+- **All feel numbers in `assets/data/tuning.json`** (player, camera, presence, haunting, scare, overhear, town memory,
+  Remembrance, Heat, mining, items, recipes, NPC, world look). The scare section is a copy of the task4 `scare_rules`
+  (same values) extended for task5; **tuning.json wins** at runtime. Villager personalities (belief, nerve, fear, lines)
+  stay in the population file; `villager_overrides` in tuning.json can override any of their numbers by id.
+- **Collision layers:** 1 non-phaseable voxels, 2 phaseable voxels, 3 wooden (phaseable) props, 4 stone props
+  (gravestones, pillars, millstone, mausoleum parts, lantern posts, the bell), 5 spirit barriers (running-water columns,
+  salt lines), 7 actors. The ghost (a floating CharacterBody3D) collides with 1, 4 and 5 only. The camera spring uses
+  1+2, or only 1 while the ghost is inside a block, so the view stays behind it. A second "x-ray" pass draws the
+  ghost's silhouette through walls.
+- **UI is code** (`UiKit`), font Fredoka (OFL). Game state, save and settings live in the `Game` autoload; sounds in
+  `Sfx` (missing sounds are skipped, so audio can be swapped file by file).
+- **Self-tests:** `--autotest` (46 checks, exit code) and `--tour` (one view per concept image) run windowed; the
+  exported exe supports both and writes next to itself (`autotest/`).
+
+## Decisions made during task5 (2026-11-17) — Scott may revisit
+- **Custom GDScript chunk mesher, not the Voxel Tools module** (the design plan's open question). Measured on this PC
+  (20 threads, RTX 5070 Ti, 1600 × 900):
+  - 254 non-empty 16³ chunks, 100,093 faces.
+  - Meshing on WorkerThreadPool: **1.94 s in the editor build, 1.07 s in the exported release**.
+  - Node and collision creation 0.1–0.2 s; the whole world is ready in about 3 s (editor) / 1.8 s (release).
+  - **About 111–114 FPS** over the village at night with shadows, glow, fog and the ink outline.
+  - A single-chunk remesh after a block edit takes a few ms on the main thread.
+
+  Good enough for the 192 × 48 × 192 slice. The open world (run 2) may need chunk streaming or a GDExtension mesher.
+- **Mesher look:**
+  - Per-vertex AO and a ±5 % per-block brightness jitter.
+  - A deterministic 3.5 cm vertex jitter; shared corners move together, so there are no cracks.
+  - The baked task1 bevel/ink tiles, normal maps from `blocks_normal.png`, ore emission from `blocks_emission.png`.
+  - Leaves and other `transparent` solids don't cull each other; plants are crossed quads that sway.
+  - Water is a separate transparent pass, its top lowered to 0.86, scrolling south.
+- **Running-water barrier:** one tall box per stream column, from 3 below the bed to 12 above the surface. Columns with
+  a solid block within 3 cells above the water (the plank bridge) are skipped. The ghost can rise at most 9 m above
+  the ground, so it can't hop over.
+- **Hover 1.05 m** (1.0 grazed the cobblestone footing course of the cottages); gliding down at 1.4 m/s. Inside a solid
+  phaseable block the ghost holds its height until you rise or sink, so it can tunnel underground.
+- **Shelter from daylight** means being within a `shelter_*` marker's radius (+1.5 m), or having at least 2 *natural*
+  solid blocks overhead (caves, dug tunnels). Cottage roofs don't count: thatch isn't natural.
+- **Night length:** the cycle is 1440 s, so night (half the cycle) lasts 12 min. The layout's `t` keys and the task4
+  schedules are cycle fractions and stay unchanged, so villagers keep their timing.
+- **Town memory counts a trick once per finished scare, not per act.**
+  - Task4's rule ("the same trick on the same object twice within 2 nights → charm"), applied per act, would charm a
+    door on its second creak, in the middle of building Unease.
+  - Now every object used in a scare that ended in a break or bolt is recorded.
+  - Using it again in a later scare within 2 nights gets it charmed by the villager who was scared. Until then, reuse
+    doubles suspicion.
+  - **Question for Scott.**
+- **Haunting 2 (Flicker) at 25 Fright:** one Terrified scare or three Spooked ones, so Flicker arrives in the first
+  night. Presence levels at 60/160/320/560 Fright raise HP 10→18, the BOO radius 4→6.4 m and manifest time 1.6→3.2 s.
+- **Grade score** is task4's table plus `three_objects` (+1 for three different objects in the chain). The slice has
+  only two abilities (Creak, Flicker), and the task asks for a combo of different objects. In the autotest, the first
+  Agnes scare (doors only, alone, back turned) grades Terrified; the second (candle by Button, door, candle) Legendary.
+- **BOO:** costs 20 Ectoplasm, has a 3 s cooldown and needs the `primed` stage (80 % of nerve).
+  - A villager who sees you manifest before they're primed botches it as "spotted" (suspicion +0.5).
+  - Otherwise an early BOO botches as "too early": they laugh it off and nerve rises by their bravery gain.
+  - Both botches salt the nearest doorway for 2 nights.
+  - Vulnerability checks: *alone* = no other awake villager (Pip counts) within 10 m; *back turned* = the ghost is more
+    than 100° off their facing; *rigged doorway* = the last door used in the chain is within 2.2 m of them.
+- **Who hears an act:**
+  - Doors and floorboards reach every villager within the hauntable's `noise_radius_m`; loudness falls to 50 % at the
+    edge, and drift-open carries 80 % as far. They wake sleepers at the nervous stage.
+  - Lights reach whoever is within 7 m; a carried light reaches only its carrier.
+  - A nearby awake villager relights a snuffed light after 7 s (1.5 s with Wren's spare candle).
+- **Villagers follow the schedule by clock:** their position along the precomputed route is the fraction of the step's
+  time, so walk speed always matches the clip's no-slide speed × playback. After a reaction they rejoin with an A* path
+  over standable voxels at 1.25 × walk speed. When fleeing they run home (or to their `flee_to`) and stay out of sight
+  for about 14 s. Doors swing open for them.
+- **Workbench placement:** the crypt is 3 × 3 and full (chest, candles, respawn point), so the Spectral Workbench
+  stands in the yard just outside the mausoleum door (30.5, 28, 88.6), facing the path.
+- **Spawn 2.5 m out of the mausoleum door:** the layout's `player_start` puts the chase camera against the wall.
+- **Tools are scaled 0.75** on the ghost (issues.md, task2) and attached by their `GRIP` node to `HELD_tool`.
+- **Lighting:**
+  - The task3 presets drive everything.
+  - Godot's ambient light is stronger than Blender's, so `world.ambient_mult` is 0.5 and `world.exposure_mult` 0.85
+    (both in tuning).
+  - Lanterns and candles are tinted warm orange (#ffad5c / #ffb24d) and given real ranges (8 m / 5 m), as task4 asked.
+  - A custom sky shader draws the gradient, the stars and the big moon.
+- **Ink outline** on props and characters is a screen-space depth-edge pass (toggle in settings); voxels keep their
+  baked ink.
+- **Audio:** every sound is synthesized by `tools/make_audio.py` (CC0, ours), plus ten CC0 Kenney variants. A
+  background agent had downloaded more packs, but some had provenance I couldn't verify (itch.io CC-BY packs), so only
+  the official Kenney packs were used. The screams and laughs are formant synthesis: cute and comic, but clearly
+  synthetic.
+- **Export:**
+  - Windows: x86_64 with the pck embedded.
+  - macOS: universal zip, ad-hoc signed with Godot's built-in signer, not notarized; ETC2/ASTC import is enabled for
+    Apple Silicon.
+  - Only the needed export templates were unpacked.

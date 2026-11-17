@@ -12,9 +12,37 @@ config_version=5
 
 config/name="Ghostopia"
 config/description="Spirit Realm Survival Game (working title)"
+config/version="0.1.0"
+run/main_scene="res://scenes/main.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+boot_splash/bg_color=Color(0.05, 0.04, 0.12, 1)
+config/icon="res://assets/ui/icon.png"
+
+[autoload]
+
+Game="*res://scripts/core/game.gd"
+Sfx="*res://scripts/core/sfx.gd"
 
 [debug]
 
 gdscript/warnings/untyped_declaration=1
 gdscript/warnings/inferred_declaration=0
+
+[display]
+
+window/size/viewport_width=1600
+window/size/viewport_height=900
+window/stretch/mode="canvas_items"
+window/stretch/aspect="expand"
+
+[gui]
+
+theme/custom_font="res://assets/ui/fonts/Fredoka.ttf"
+
+[rendering]
+
+textures/vram_compression/import_etc2_astc=true
+
+anti_aliasing/quality/msaa_3d=2
+lights_and_shadows/directional_shadow/size=4096
+environment/defaults/default_clear_color=Color(0.05, 0.04, 0.12, 1)
