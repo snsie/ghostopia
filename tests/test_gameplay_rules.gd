@@ -30,7 +30,11 @@ func test_tuning_levels() -> void:
 	assert_eq(String(_t.level_for("haunting.levels", 0)["unlock"]), "creak")
 	var lv2 := _t.level_for("haunting.levels", _t.f("haunting.levels.1.fright"))
 	assert_eq(String(lv2["unlock"]), "flicker")
-	assert_eq(int(_t.level_for("haunting.levels", 99999)["level"]), 2, "level 3 is locked in the slice")
+	assert_eq(String(_t.level_for("haunting.levels", 35)["unlock"]), "haunted_furniture")
+	assert_eq(String(_t.level_for("haunting.levels", 59)["unlock"]), "haunted_furniture")
+	assert_eq(String(_t.level_for("haunting.levels", 60)["unlock"]), "object_possession")
+	assert_eq(String(_t.level_for("haunting.levels", 100)["unlock"]), "animal_possession")
+	assert_eq(String(_t.level_for("haunting.levels", 150)["unlock"]), "villager_possession")
 	assert_eq(int(_t.level_for("presence.levels", 0)["hp"]), 10)
 	assert_eq(int(_t.next_level("haunting.levels", 0)["level"]), 2)
 

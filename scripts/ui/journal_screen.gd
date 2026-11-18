@@ -176,6 +176,11 @@ func _show_villagers() -> void:
 
 
 func _show_legend() -> void:
+	_right.add_child(_ink_heading("Haunting"))
+	for row: Dictionary in Game.tuning.a("haunting.levels"):
+		if not Game.ability_unlocked(row.unlock):
+			_right.add_child(UiKit.ink_label("Next: %s · %d / %d Haunting Fright" % [row.name, Game.path_fright["haunting"], row.fright], 17))
+			break
 	var ln := Game.town.legend_name()
 	_right.add_child(_ink_heading(ln.capitalize() if ln != "" else "No legend yet"))
 	_right.add_child(UiKit.ink_label("Legend points: %d   ·   Heat: %d" % [int(Game.town.legend_points), int(Game.town.heat)], 18))

@@ -362,7 +362,7 @@ func roofed(p: Vector3, limit: int = 12) -> bool:
 
 
 ## Voxel DDA. Returns {hit, cell, normal, block, dist}. Skips air and liquids; plants count.
-func raycast(from: Vector3, dir: Vector3, max_dist: float) -> Dictionary:
+func raycast(from: Vector3, dir: Vector3, max_dist: float, solid_only := false) -> Dictionary:
 	dir = dir.normalized()
 	var c := cell_of(from)
 	var step := Vector3i(signi(int(signf(dir.x))), signi(int(signf(dir.y))), signi(int(signf(dir.z))))
@@ -380,7 +380,7 @@ func raycast(from: Vector3, dir: Vector3, max_dist: float) -> Dictionary:
 	var t := 0.0
 	while t <= max_dist:
 		var b := get_block_v(c)
-		if b != 0 and reg.liquid[b] == 0:
+		if b != 0 and reg.liquid[b] == 0 and (not solid_only or reg.solid[b] == 1):
 			return {"hit": true, "cell": c, "normal": normal, "block": b, "dist": t}
 		var ax := 0
 		if t_max.y < t_max[ax]:

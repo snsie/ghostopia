@@ -59,6 +59,10 @@ func haunt(h: Hauntable, action: String) -> String:
 	# using it again in a later scare doubles suspicion.
 	var same_twice := Game.town.used_before(h.id, ability)
 	var base_u := float(h.data.get("unease", {}).get(action, 8.0))
+	if action == "rock_wildly":
+		base_u = 26.0
+	elif action == "tilt_portrait":
+		base_u = 23.0
 	var hearers := _affected(h, action)
 	last_act = {"object": h.id, "action": action, "hearers": hearers.map(func(e: Array) -> String: return (e[0] as Npc).id)}
 	for e in hearers:
@@ -68,7 +72,7 @@ func haunt(h: Hauntable, action: String) -> String:
 			if h.kind in ["door", "floorboard"]:
 				n.wake(t.f("scare.wake_unease_fraction", 0.45))
 			continue
-		var mult := factor   # carried lights: the population data's unease values already include x1.5
+		var mult := factor * (1.0 + 0.05 * Game.trait_rank("haunting"))
 		var res := n.mind.apply_act({"object": h.id, "kind": h.kind, "ability": ability, "action": action,
 			"unease": base_u, "fears": h.data.get("fears", []), "same_trick_twice": same_twice, "mult": mult,
 			"pos": h.world_pos()}, _now, _sc())
@@ -79,6 +83,8 @@ func haunt(h: Hauntable, action: String) -> String:
 			_suspicious(n, r, h)
 		if res["bolted"]:
 			_bolt(n)
+		else:
+			n.investigate(h.world_pos())
 	return "ok"
 
 

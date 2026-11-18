@@ -250,8 +250,39 @@ func _set_item(item: Variant, clip: String) -> void:
 
 # ---------------------------------------------------------------- update
 
+var possessed := false
+var _investigate_after := 0.0
+
+
+func available_to_chat() -> bool:
+	return not possessed and mode == Mode.SCHEDULE and visible and is_awake() and _now >= _investigate_after
+
+
+func chat_with(other: Npc, now: float) -> void:
+	var greetings := {"agnes": "The millstones have been restless.", "pip": "Did you see the lights?", "marlow": "Keep your lantern close."}
+	say(greetings.get(id, "How is your evening?") if mind.frac() < 0.5 else "I don't like how quiet it is.")
+	other.say("Let's keep walking." if other.mind.frac() >= 0.5 else "Evening, %s." % data.get("name", id))
+	_investigate_after = now + 25.0
+	other._investigate_after = now + 25.0
+	play_clip("idle", 2.0, "rejoin")
+	other.play_clip("idle", 2.0, "rejoin")
+
+
+func investigate(point: Vector3) -> void:
+	if possessed or mode != Mode.SCHEDULE or not is_awake() or _now < _investigate_after:
+		return
+	if global_position.distance_to(point) > 7.0 or global_position.distance_to(point) < 1.0:
+		return
+	_investigate_after = _now + 25.0
+	var lines := {"agnes": "The mill makes stranger sounds than that.", "pip": "Hello? Is somebody there?"}
+	say(lines.get(id, "I thought I heard something."))
+	_go(global_position.lerp(point, 0.5), 0.9, "walk", "rejoin")
+
+
 func tick(dt: float, now: float) -> void:
 	_now = now
+	if possessed:
+		return
 	if now < _hidden_until:
 		return
 	if not visible:
@@ -415,6 +446,8 @@ func _hide(seconds: float) -> void:
 func _tick_path(dt: float) -> void:
 	if _path_i >= _path.size():
 		match _path_then:
+			"rejoin":
+				_rejoin()
 			"hide":
 				_hide(Game.tuning.f("scare.recover_after_break_s", 14.0))
 			_:

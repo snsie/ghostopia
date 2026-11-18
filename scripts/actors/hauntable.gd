@@ -103,6 +103,10 @@ func strong_action() -> String:
 	var a := actions()
 	if kind == "door":
 		return "drift_open"   # slam is Haunted Furniture (level 3)
+	if kind == "rocking_chair":
+		return "rock_wildly"
+	if kind == "portrait":
+		return "tilt_portrait"
 	return String(a[1]) if a.size() > 1 else ""
 
 
@@ -115,6 +119,10 @@ func can_act(action: String) -> bool:
 func act(action: String, now: float) -> void:
 	_cooldown_until = now + float(data.get("cooldown_s", 6.0))
 	show_glow(Game.tuning.f("haunting.haunt_glow_s", 1.6))
+	if ability() == "haunted_furniture":
+		_animate_furniture(action == strong_action())
+		acted.emit(self, action)
+		return
 	match action:
 		"creak":
 			if kind == "door":
@@ -137,6 +145,25 @@ func act(action: String, now: float) -> void:
 			set_lit(false)
 			Sfx.play_at("candle_snuff", world_pos(), 0.0)
 	acted.emit(self, action)
+
+
+func _animate_furniture(strong: bool) -> void:
+	if _tween:
+		_tween.kill()
+	_tween = create_tween().set_parallel(true)
+	for i in int_nodes.size():
+		var part := int_nodes[i]
+		if part is StaticBody3D:
+			continue
+		var rest := rest_rot[i]
+		var axis := Vector3.RIGHT if kind == "rocking_chair" else Vector3.UP
+		var amount := 0.36 if strong else 0.13
+		_tween.tween_property(part, "rotation", rest + axis * amount, 0.14)
+	_tween.chain().set_parallel(true)
+	for i in int_nodes.size():
+		if not int_nodes[i] is StaticBody3D:
+			_tween.tween_property(int_nodes[i], "rotation", rest_rot[i], 0.4)
+	Sfx.play_at("creak_door", world_pos(), 0.0 if strong else -8.0)
 
 
 func set_lit(v: bool) -> void:

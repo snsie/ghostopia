@@ -36,8 +36,15 @@ alone with their back to you. Don't push past their nerve: they bolt. Be home (m
 | Hotbar | 1-9, mouse wheel | — |
 | Haunt the targeted object: gentle (creak, dim) / strong (drift open, snuff) | E / R | X / Y |
 | BOO (manifest) | F | right stick click |
+| Possess or release a host after unlocking the ability | G | D-pad right |
+| Use a possessed host’s action | E | X |
 | Workbench (near it) / sleep through the day (in the mausoleum) | Q | D-pad up |
 | Journal / inventory / pause | J / Tab or I / Esc | D-pad down / Back / Start |
+
+Double-tap and hold a direction key to sprint. In Inventory, select a numbered hotbar slot and click a tool
+or placeable block to assign it. Spend shared level-up picks in the same screen to evolve your ghost.
+The Memory Journal shows your next Haunting unlock. Look for named entrances around Millbrook to explore
+the three underground caverns.
 
 Feel numbers live in **`assets/data/tuning.json`** (speeds, camera, Unease math, grades, payouts, level thresholds,
 cycle length, recipes, Remembrance and Heat rates). Edit and restart; no code changes needed.

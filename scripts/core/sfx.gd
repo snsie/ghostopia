@@ -8,6 +8,7 @@ const ROOT := "res://assets/audio"
 var _cache: Dictionary = {}       # name -> Array[AudioStream]
 var _music: AudioStreamPlayer
 var _music_name := ""
+var _music_fade: Tween
 var _amb: Dictionary = {}         # name -> AudioStreamPlayer
 var _amb_target: Dictionary = {}  # name -> linear volume target
 var _missing: Dictionary = {}
@@ -76,12 +77,19 @@ func ui(name: String = "ui_click") -> void:
 	play(name, -4.0, 0.03)
 
 
+func register_stream(name: String, stream: AudioStream) -> void:
+	_cache[name] = [stream]
+
+
 func music(name: String, fade_s: float = 1.5) -> void:
 	if name == _music_name:
 		return
 	_music_name = name
 	var v := _variants(name)
-	var tw := create_tween()
+	if _music_fade:
+		_music_fade.kill()
+	_music_fade = create_tween()
+	var tw := _music_fade
 	tw.tween_property(_music, "volume_db", -40.0, fade_s * 0.5)
 	tw.tween_callback(func() -> void:
 		if v.is_empty():

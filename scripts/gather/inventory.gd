@@ -59,6 +59,18 @@ func is_tool(id: String) -> bool:
 	return TOOLS.has(id)
 
 
+## Assign an owned tool or placeable block to the selected slot.
+func assign_selected(id: String) -> bool:
+	if not (tool_tier(id) > 0 if is_tool(id) else block_for(id) != "" and count(id) > 0):
+		return false
+	var old := hotbar.find(id)
+	if old >= 0:
+		hotbar[old] = ""
+	hotbar[selected] = id
+	changed.emit()
+	return true
+
+
 ## Placeable blocks get a hotbar slot automatically (the first free one).
 func _auto_slot(item: String) -> void:
 	if not _placeable.has(item) or hotbar.has(item):
@@ -132,5 +144,5 @@ func from_save(d: Dictionary) -> void:
 		hotbar.append(String(s))
 	while hotbar.size() < HOTBAR_SIZE:
 		hotbar.append("")
-	selected = int(d.get("selected", 0))
+	selected = clampi(int(d.get("selected", 0)), 0, HOTBAR_SIZE - 1)
 	changed.emit()

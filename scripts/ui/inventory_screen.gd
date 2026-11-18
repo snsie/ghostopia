@@ -10,6 +10,7 @@ var at_workbench := false
 var _grid: GridContainer
 var _recipes: VBoxContainer
 var _tools: VBoxContainer
+var _slots: HBoxContainer
 
 
 func _ready() -> void:
@@ -40,7 +41,9 @@ func _ready() -> void:
 	mid.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	hb.add_child(mid)
 	mid.add_child(UiKit.heading("Items", 22))
-	mid.add_child(UiKit.label("Click a block to put it in the selected hotbar slot.", 15, Color(0.8, 0.85, 1.0)))
+	mid.add_child(UiKit.label("Choose a slot, then a tool or block.", 15, Color(0.8, 0.85, 1.0)))
+	_slots = HBoxContainer.new()
+	mid.add_child(_slots)
 	_grid = GridContainer.new()
 	_grid.columns = 6
 	_grid.add_theme_constant_override("h_separation", 8)
@@ -58,6 +61,11 @@ func _ready() -> void:
 
 
 func _unhandled_input(e: InputEvent) -> void:
+	for slot in Inventory.HOTBAR_SIZE:
+		if e.is_action_pressed("slot_%d" % (slot + 1)):
+			get_viewport().set_input_as_handled()
+			_select_slot(slot)
+			return
 	if e.is_action_pressed("inventory") or e.is_action_pressed("pause"):
 		get_viewport().set_input_as_handled()
 		closed.emit()
@@ -66,23 +74,39 @@ func _unhandled_input(e: InputEvent) -> void:
 func _refresh() -> void:
 	if not is_inside_tree():
 		return
-	for box in [_grid, _recipes, _tools]:
+	for box in [_grid, _recipes, _tools, _slots]:
 		for c in box.get_children():
+			box.remove_child(c)
 			c.queue_free()
-	_tools.add_child(UiKit.heading("Basic Ghost", 22))
+	_tools.add_child(UiKit.heading("Ghost Traits", 22))
 	_tools.add_child(UiKit.label("HP %d · Spectral" % int(Game.max_hp()), 16))
-	for t in Inventory.TOOLS:
-		var row := HBoxContainer.new()
-		var ic := TextureRect.new()
-		ic.texture = UiKit.icon_for(t)
-		ic.custom_minimum_size = Vector2(56, 56)
-		ic.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
-		ic.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
-		row.add_child(ic)
-		row.add_child(UiKit.label(UiKit.item_name(t), 18))
-		_tools.add_child(row)
-	_tools.add_child(UiKit.label("Cosmetics: masks, hats, gloves (run 2)", 14, Color(0.7, 0.7, 0.8)))
+	_tools.add_child(UiKit.label("Unspent trait picks: %d" % Game.pending_traits(), 16))
+	for id: String in ["haunting", "drift", "resilience"]:
+		var benefit: String = {"haunting": "+5% Unease", "drift": "+5% speed", "resilience": "+2 max HP"}[id]
+		var trait_button := UiKit.button("%s %d  ·  %s" % [id.capitalize(), Game.trait_rank(id), benefit],
+			func() -> void:
+				Game.choose_trait(id)
+				_refresh())
+		trait_button.disabled = Game.pending_traits() == 0
+		_tools.add_child(trait_button)
 	var inv := Game.inventory
+	for tool: String in Inventory.TOOLS:
+		var button := UiKit.button(UiKit.item_name(tool), _assign.bind(tool))
+		button.icon = UiKit.icon_for(tool)
+		button.expand_icon = true
+		button.custom_minimum_size.y = 52
+		button.disabled = inv.tool_tier(tool) <= 0
+		_tools.add_child(button)
+	for slot in Inventory.HOTBAR_SIZE:
+		var button := UiKit.button(str(slot + 1), _select_slot.bind(slot))
+		button.toggle_mode = true
+		button.button_pressed = slot == inv.selected
+		button.custom_minimum_size = Vector2(42, 38)
+		var item := inv.hotbar[slot]
+		button.tooltip_text = UiKit.item_name(item) if item != "" else "Empty slot"
+		button.icon = UiKit.icon_for(item) if item != "" else null
+		button.expand_icon = true
+		_slots.add_child(button)
 	var keys := inv.items.keys()
 	keys.sort()
 	for k: String in keys:
@@ -95,14 +119,8 @@ func _refresh() -> void:
 		b.icon_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		b.vertical_icon_alignment = VERTICAL_ALIGNMENT_TOP
 		b.add_theme_font_size_override("font_size", 16)
-		b.pressed.connect(func() -> void:
-			if inv.block_for(k) != "":
-				var old := inv.hotbar.find(k)
-				if old >= 0:
-					inv.hotbar[old] = ""
-				inv.hotbar[inv.selected] = k
-				Sfx.ui("ui_click")
-				inv.changed.emit())
+		b.disabled = inv.block_for(k) == ""
+		b.pressed.connect(_assign.bind(k))
 		_grid.add_child(b)
 	if keys.is_empty():
 		_grid.add_child(UiKit.label("Empty. Gather with your tools.", 16))
@@ -127,3 +145,13 @@ func _refresh() -> void:
 		btn.custom_minimum_size = Vector2(120, 36)
 		v.add_child(btn)
 		_recipes.add_child(box)
+
+
+func _select_slot(slot: int) -> void:
+	Game.inventory.selected = slot
+	Game.inventory.changed.emit()
+
+
+func _assign(item: String) -> void:
+	if Game.inventory.assign_selected(item):
+		Sfx.ui("ui_click")
