@@ -1,0 +1,53 @@
+{
+  "name": "crystal_sentinel",
+  "triangles": 4238,
+  "vertices": 2379,
+  "closed_components": 130,
+  "bones": 26,
+  "height_m": 2.8,
+  "root_motion": false,
+  "clips": {
+    "idle": {
+      "duration_s": 4.0,
+      "frames": 96,
+      "loop": true
+    },
+    "walk": {
+      "duration_s": 2.0,
+      "frames": 48,
+      "loop": true
+    },
+    "attack_slam": {
+      "duration_s": 2.0,
+      "frames": 48,
+      "loop": false
+    },
+    "hit": {
+      "duration_s": 0.5,
+      "frames": 12,
+      "loop": false
+    },
+    "death": {
+      "duration_s": 2.0,
+      "frames": 48,
+      "loop": false
+    }
+  },
+  "walk_speed_mps": 0.369648719166477,
+  "materials": [
+    "Sentinel_Obsidian",
+    "Sentinel_Quartz",
+    "FLAME_sentinel_core",
+    "FLAME_sentinel_eye",
+    "Sentinel_FaceVoid"
+  ],
+  "blender_front": "-Y",
+  "godot_front": "+Z",
+  "model": "res://assets/characters/crystal_sentinel.gltf",
+  "texture": "res://assets/textures/crystal_sentinel_atlas.png",
+  "source": "blender/crystal_sentinel.blend",
+  "units": "metres",
+  "fps": 24,
+  "material_surfaces": 5,
+  "collision": "Create a capsule/convex body in the gameplay scene; no collision mesh included."
+}

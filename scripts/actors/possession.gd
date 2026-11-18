@@ -17,6 +17,7 @@ var cooldowns := {}
 var animals: Array[Node3D] = []
 var animal_homes: Array[Vector3] = []
 var clock := 0.0
+var animal_alarm := {}
 
 
 static func animal_voice(dog: bool) -> AudioStreamWAV:
@@ -85,6 +86,12 @@ func update(dt: float) -> void:
 		if animal != host:
 			var phase := clock * 0.3 + i * PI
 			var goal := animal_homes[i] + Vector3(cos(phase), 0, sin(phase)) * 2.0
+			if animal_alarm.has(animal):
+				var alarm: Dictionary = animal_alarm[animal]
+				if clock < float(alarm.until):
+					goal = animal.global_position + (animal.global_position - Vector3(alarm.point)).normalized() * 4.0
+				else:
+					animal_alarm.erase(animal)
 			_walk(animal, goal - animal.global_position, dt, false)
 	if host:
 		if player.scattered_now:
@@ -205,24 +212,57 @@ func toggle() -> void:
 	player._clear_sprint_taps()
 
 
+func startle_animals(point: Vector3, radius: float) -> void:
+	for animal in animals:
+		if animal.global_position.distance_to(point) <= radius:
+			animal_alarm[animal] = {"point": point, "until": clock + 4.0}
+			Sfx.play_at("dog_bark" if animal.name == "Dog" else "cat_hiss", animal.global_position)
+
+
+func _effect(point: Vector3, color: Color, duration: float) -> MeshInstance3D:
+	var effect := MeshInstance3D.new()
+	effect.mesh = SphereMesh.new()
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.emission_enabled = true
+	material.emission = color
+	effect.material_override = material
+	add_child(effect)
+	effect.global_position = point
+	effect.scale = Vector3.ONE * 0.12
+	var animation := effect.create_tween()
+	animation.tween_property(effect, "scale", Vector3(0.7, 0.24, 0.8), duration)
+	animation.tween_callback(effect.queue_free)
+	return effect
+
+
 func action() -> void:
 	if not host or acted:
 		return
 	acted = true
 	var point := host.global_position
+	var source := _name(host)
 	if host is Npc:
-		host.say("What was that?!")
-		return
+		var rest_x := host.rotation.x
+		var motion := host.create_tween()
+		motion.tween_property(host, "rotation:x", rest_x + 0.35, 0.22)
+		motion.tween_property(host, "rotation:x", rest_x, 0.5)
+		_effect(host.head_pos() - Vector3.UP * 0.35 + host.forward * 0.32, Color.YELLOW_GREEN, 0.7)
+		Sfx.play_at("gasp", host.head_pos(), -1.0)
 	if tier == 0:
 		var rest := host.rotation
 		var tw := host.create_tween()
 		tw.tween_property(host, "rotation", rest + Vector3(0.4, 0, 0), 0.11)
 		tw.tween_property(host, "rotation", rest, 0.22)
 	var sound := "creak_floor" if tier == 0 else ("dog_bark" if host.name == "Dog" else "cat_hiss")
-	Sfx.play_at(sound, point)
-	for n: Npc in player.gw.npcs:
-		if n.global_position.distance_to(point) < 5.0:
-			n.investigate(point)
+	if not host is Npc:
+		Sfx.play_at(sound, point)
+	player.gw.director.possession_scare(point, source, 22.0, host as Npc)
+	if Game.ability_unlocked("aftershock"):
+		var echo := _effect(point + Vector3.UP * 0.5, Color.MEDIUM_PURPLE, 2.2)
+		echo.create_tween().tween_interval(2.0).finished.connect(func() -> void:
+			Sfx.play_at("whoosh", point)
+			player.gw.director.possession_scare(point, source + "_aftershock", 11.0))
 
 
 func release() -> void:
@@ -232,6 +272,9 @@ func release() -> void:
 	if host is Npc:
 		host.possessed = false
 		host._rejoin()
+		if acted:
+			host.say("What happened to me?")
+			player.gw.director.possession_scare(host.global_position, "released_host", 18.0, null, host)
 	elif tier == 0:
 		host.global_transform = home
 	host = null

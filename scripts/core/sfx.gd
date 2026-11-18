@@ -20,7 +20,23 @@ func _ready() -> void:
 	_music = AudioStreamPlayer.new()
 	_music.bus = "Music"
 	add_child(_music)
+	register_stream("bell_ring", _bell_sound())
 	_music.finished.connect(func() -> void: _music.play())
+
+
+func _bell_sound() -> AudioStreamWAV:
+	var rate := 22050
+	var pcm := PackedByteArray()
+	pcm.resize(rate * 4)
+	for i in rate * 2:
+		var t := float(i) / rate
+		var tones := sin(TAU * 420.0 * t) + 0.42 * sin(TAU * 1017.0 * t) + 0.25 * sin(TAU * 1735.0 * t)
+		pcm.encode_s16(2 * i, int(tones * 13500.0 * exp(-2.9 * t) * minf(1.0, 500.0 * t)))
+	var sound := AudioStreamWAV.new()
+	sound.format = AudioStreamWAV.FORMAT_16_BITS
+	sound.mix_rate = rate
+	sound.data = pcm
+	return sound
 
 
 func _variants(name: String) -> Array:

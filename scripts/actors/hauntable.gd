@@ -78,6 +78,8 @@ func world_pos() -> Vector3:
 
 
 func ability() -> String:
+	if kind == "bell":
+		return "bell_ringing"
 	return String(data.get("ability", ""))
 
 
@@ -102,7 +104,9 @@ func gentle_action() -> String:
 func strong_action() -> String:
 	var a := actions()
 	if kind == "door":
-		return "drift_open"   # slam is Haunted Furniture (level 3)
+		return "slam" if Game.ability_unlocked("door_slam") else "drift_open"
+	if kind == "bell":
+		return "ring"
 	if kind == "rocking_chair":
 		return "rock_wildly"
 	if kind == "portrait":
@@ -123,6 +127,10 @@ func act(action: String, now: float) -> void:
 		_animate_furniture(action == strong_action())
 		acted.emit(self, action)
 		return
+	if action == "ring":
+		_ring()
+		acted.emit(self, action)
+		return
 	match action:
 		"creak":
 			if kind == "door":
@@ -136,7 +144,9 @@ func act(action: String, now: float) -> void:
 			_hold_open_until = now + 7.0
 			Sfx.play_at("creak_door", world_pos(), 3.0, 30.0, 0.15)
 		"slam":
+			door_open = maxf(door_open, 0.65)
 			_door_target = 0.0
+			_hold_open_until = now
 			Sfx.play_at("door_slam", world_pos(), 4.0)
 		"dim":
 			set_dim(true, now + 14.0)
@@ -145,6 +155,18 @@ func act(action: String, now: float) -> void:
 			set_lit(false)
 			Sfx.play_at("candle_snuff", world_pos(), 0.0)
 	acted.emit(self, action)
+
+
+func _ring() -> void:
+	if _tween:
+		_tween.kill()
+	_tween = create_tween()
+	for step in 6:
+		var angle := sin(float(step + 1) * PI * 0.5) * (6.0 - step) * 0.06
+		for i in int_nodes.size():
+			_tween.parallel().tween_property(int_nodes[i], "rotation", rest_rot[i] + Vector3(angle, 0, 0), 0.15)
+		_tween.chain().tween_interval(0.01)
+	Sfx.play_at("bell_ring", world_pos(), 2.0, 37.0, 0.0)
 
 
 func _animate_furniture(strong: bool) -> void:

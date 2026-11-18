@@ -94,6 +94,7 @@ func start_game(load_save: bool) -> void:
 	add_child(world)
 	world.load_level(Game.layout, Game.blocks, Game.tuning.f("world.vertex_jitter_m", 0.035))
 	CavernSystem.carve(world)
+	preload("res://scripts/world/districts.gd").build(world)
 	if save.has("world_edits"):
 		world.apply_edits(save["world_edits"])
 	build_stats = world.build_all()

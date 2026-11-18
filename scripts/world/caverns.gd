@@ -16,6 +16,7 @@ const ROOMS := [
 var game_world: Node
 var active := -1
 var enemies: Array[Node3D] = []
+var sentinel_animation: AnimationPlayer
 var fragments: Array[Node3D] = []
 var attack_time := 0.0
 var recovery := 0.0
@@ -70,7 +71,28 @@ func setup(gw: Node) -> void:
 				var crystal := _shape(point, Vector3(0.48, 0.95 + float(j % 3) * 0.4, 0.48), color, 2)
 				crystal.rotation.z = sin(angle) * 0.24
 			_light(point + Vector3.UP * 0.3, color, 2.5)
-		var enemy := _shape(c + Vector3(1.5, 0.88, 1.6), Vector3(0.55, 0.72, 0.55), color.darkened(0.18), i)
+		var enemy: Node3D
+		if i == 2:
+			enemy = (load("res://assets/characters/crystal_sentinel.gltf") as PackedScene).instantiate()
+			add_child(enemy)
+			enemy.position = c + Vector3(1.5, 0, 1.6)
+			sentinel_animation = Actors.find_prefix(enemy, "AnimationPlayer") as AnimationPlayer
+			Actors.setup_loops(sentinel_animation, Game._json("res://assets/characters/crystal_sentinel.json"))
+			sentinel_animation.play("idle")
+			var body := AnimatableBody3D.new()
+			body.collision_layer = VoxelWorld.L_SOLID
+			body.collision_mask = 0
+			body.sync_to_physics = false
+			enemy.add_child(body)
+			var bounds := CollisionShape3D.new()
+			var capsule := CapsuleShape3D.new()
+			capsule.radius = 0.43
+			capsule.height = 2.55
+			bounds.shape = capsule
+			bounds.position.y = 1.275
+			body.add_child(bounds)
+		else:
+			enemy = _shape(c + Vector3(1.5, 0.88, 1.6), Vector3(0.55, 0.72, 0.55), color.darkened(0.18), i)
 		enemies.append(enemy)
 		fragments.append(_shape(c + Vector3(3.2, 1.0, 0), Vector3(0.30, 0.48, 0.30), color.lightened(0.45), 2))
 		Sfx.register_stream(room.id, _music(room.notes))
@@ -164,24 +186,37 @@ func tick(dt: float) -> void:
 		Game.collect_fragment(room.id)
 	var enemy := enemies[index]
 	var center := Vector3(room.center) + Vector3(0.5, 0.88, 0.5)
+	if index == 2:
+		center.y -= 0.88
 	var goal := Vector3(pos.x, center.y, pos.z)
-	var distance := enemy.global_position.distance_to(pos)
+	var horizontal := Vector2(pos.x - enemy.global_position.x, pos.z - enemy.global_position.z)
+	var distance := horizontal.length() if index == 2 else enemy.global_position.distance_to(pos)
 	var triggered := (index == 0 and pos.distance_to(center) < 3.6) or index == 1 or (index == 2 and player.velocity.length() > 0.7)
 	if attack_time > 0.0:
-		enemy.material_override.emission_energy_multiplier = 1.4 + 0.5 * sin(attack_time * 29.0)
+		if index != 2:
+			enemy.material_override.emission_energy_multiplier = 1.4 + 0.5 * sin(attack_time * 29.0)
 		attack_time -= dt
 		if attack_time <= 0.0:
-			enemy.material_override.emission_energy_multiplier = 0.55
+			if index != 2:
+				enemy.material_override.emission_energy_multiplier = 0.55
 			if distance < 1.45:
 				Game.hp = maxf(0.0, Game.hp - (1.0 + index * 0.5))
 				Sfx.play("hurt")
 			recovery = 1.4
 		return
 	recovery = maxf(0.0, recovery - dt)
+	if index == 2:
+		if horizontal.length() > 0.15 and triggered:
+			enemy.rotation.y = atan2(horizontal.x, horizontal.y)
+		var clip := "walk" if triggered and distance > 1.15 else "idle"
+		if sentinel_animation.current_animation != clip and not (sentinel_animation.current_animation == "attack_slam" and sentinel_animation.is_playing()):
+			sentinel_animation.play(clip, 0.15)
 	if triggered:
 		enemy.global_position = enemy.global_position.move_toward(goal, dt * (0.75 + index * 0.22))
 		if distance < 1.3 and recovery == 0.0:
-			attack_time = 0.65
+			attack_time = 0.88 if index == 2 else 0.65
+			if index == 2:
+				sentinel_animation.play("attack_slam", 0.08)
 			game_world.hud.hint("%s is about to strike!" % room.enemy)
 			Sfx.play_at("whoosh", enemy.global_position)
 	else:

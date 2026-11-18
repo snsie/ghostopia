@@ -36,8 +36,10 @@ func haunt(h: Hauntable, action: String) -> String:
 	if action == "":
 		return "no action"
 	if not Game.ability_unlocked(ability):
-		var lvl := int(h.data.get("level", 1))
-		gw.hud.hint("%s needs Haunting level %d" % [ability.capitalize(), lvl])
+		for row: Dictionary in t.a("haunting.levels"):
+			if row.unlock == ability:
+				gw.hud.hint("%s unlocks at %d Haunting Fright." % [row.name, row.fright])
+				break
 		return "locked"
 	if Game.town.is_unhauntable(h.id):
 		gw.hud.hint("A charm hangs here. It won't answer you for a while.")
@@ -52,24 +54,46 @@ func haunt(h: Hauntable, action: String) -> String:
 		gw.hud.hint("Not enough Ectoplasm")
 		return "ecto"
 	Game.ecto -= cost
+	var affected_lights: Array[Hauntable] = []
 	h.act(action, _now)
+	if action == "ring":
+		gw.player.possession.startle_animals(h.world_pos(), float(h.data.get("noise_radius_m", 14.0)))
+	if action == "snuff" and Game.ability_unlocked("blackout"):
+		var extra := 0
+		for other: Hauntable in gw.level.hauntables.values():
+			if other != h and other.is_light() and other.can_act("snuff") and not other.on_cooldown(_now) and not Game.town.is_unhauntable(other.id) and other.world_pos().distance_to(h.world_pos()) <= 4.0:
+				other.act("snuff", _now)
+				affected_lights.append(other)
+				extra += 1
+				if extra == 2:
+					break
 	gw.player._play_clip("haunt_cast", 0.6)
 	gw.player.set_expression("happy", 1.0)
 	# A trick counts for town memory only once it was part of a finished scare (see _remember_tricks);
 	# using it again in a later scare doubles suspicion.
 	var same_twice := Game.town.used_before(h.id, ability)
 	var base_u := float(h.data.get("unease", {}).get(action, 8.0))
+	if action == "slam":
+		base_u = maxf(base_u, 20.0)
 	if action == "rock_wildly":
 		base_u = 26.0
 	elif action == "tilt_portrait":
 		base_u = 23.0
 	var hearers := _affected(h, action)
+	var heard := {}
+	for entry in hearers:
+		heard[entry[0]] = true
+	for light in affected_lights:
+		for entry in _affected(light, "snuff"):
+			if not heard.has(entry[0]):
+				hearers.append(entry)
+				heard[entry[0]] = true
 	last_act = {"object": h.id, "action": action, "hearers": hearers.map(func(e: Array) -> String: return (e[0] as Npc).id)}
 	for e in hearers:
 		var n: Npc = e[0]
 		var factor: float = e[1]
 		if n.asleep and not n.now_awake():
-			if h.kind in ["door", "floorboard"]:
+			if h.kind in ["door", "floorboard", "bell"]:
 				n.wake(t.f("scare.wake_unease_fraction", 0.45))
 			continue
 		var mult := factor * (1.0 + 0.05 * Game.trait_rank("haunting"))
@@ -107,6 +131,22 @@ func _remember_tricks(n: Npc, chain: Array) -> void:
 
 ## Villagers reached by an act: [[npc, factor]]. Noise carries `noise_radius_m`; a light act reaches
 ## whoever is near the light; a carried light only its carrier.
+func possession_scare(point: Vector3, source: String, amount: float, exclude: Npc = null, only: Npc = null) -> void:
+	for n: Npc in gw.npcs:
+		if n == exclude or (only != null and n != only) or not n.visible or not n.is_awake() or not n.is_target():
+			continue
+		var distance := n.global_position.distance_to(point)
+		var factor := ScareMath.noise_factor(distance, 7.0, 0.55)
+		if factor <= 0.0:
+			continue
+		var response := n.mind.apply_act({"object": source, "kind": "possession", "ability": "possession",
+			"action": "startle", "unease": amount, "fears": ["loud_noises"], "mult": factor,
+			"pos": point}, _now, _sc())
+		n.react_stage(response["stage_before"], response["stage_after"])
+		if response["bolted"]:
+			_bolt(n)
+
+
 func _affected(h: Hauntable, action: String) -> Array:
 	var out: Array = []
 	var p := h.world_pos()
@@ -126,6 +166,13 @@ func _affected(h: Hauntable, action: String) -> Array:
 				out.append([n, 1.0])
 		else:
 			var radius := float(h.data.get("noise_radius_m", 8.0))
+			if h.kind == "portrait":
+				radius = 4.0
+				var direction := n.head_pos() - p
+				if gw.world.raycast(p, direction.normalized(), maxf(0.0, direction.length() - 0.15), true).get("hit", false):
+					continue
+			if action == "slam":
+				radius *= 1.5
 			if action == "drift_open":
 				radius *= 0.8
 			var f := ScareMath.noise_factor(d, radius, float(sc.get("noise_falloff", 0.5)))
@@ -148,10 +195,10 @@ func _suspicious(n: Npc, r: Dictionary, h: Hauntable) -> void:
 			var target := String(r.get("target", "last_haunted_object"))
 			if target == "last_haunted_object":
 				target = h.id
-			var nights := int(eff.get("nights", eff.get("unhauntable_nights", Game.tuning.i("town_memory.charm_unhauntable_nights", 3))))
+			var nights := Game.tuning.i("town_memory.charm_unhauntable_nights", 1)
 			Game.town.hang_charm(target, String(r.get("charm_prop", n.data.get("charm", {}).get("kind", "garlic_lavender"))), nights, n.id)
 			gw.level.show_charm(target, String(Game.town.charms[target]["charm"]))
-			Game.toast.emit("%s hung a charm. That one's off limits for %d nights." % [n.data["name"], nights], "memory")
+			Game.toast.emit("%s hung a charm. That one's off limits until nightfall." % n.data["name"], "memory")
 		"scatter_salt":
 			var door := String(eff.get("salt_line", r.get("target", "")))
 			_salt(door, int(eff.get("nights", 2)), n)
@@ -168,7 +215,7 @@ func _suspicious(n: Npc, r: Dictionary, h: Hauntable) -> void:
 
 
 func _hang_charm(n: Npc, h: Hauntable) -> void:
-	var nights := Game.tuning.i("town_memory.charm_unhauntable_nights", 3)
+	var nights := Game.tuning.i("town_memory.charm_unhauntable_nights", 1)
 	var charm := String(n.data.get("charm", {}).get("kind", "garlic_lavender"))
 	Game.town.hang_charm(h.id, charm, nights, n.id)
 	gw.level.show_charm(h.id, charm)
