@@ -1,5 +1,5 @@
-## One UI kit for every screen (matches concept/ui): translucent dark slate panels with thin cyan
-## frames and glowing corner brackets, white and gold rounded headings (Fredoka), green and cyan
+## One UI kit for every screen: translucent dark slate panels with thin cyan
+## frames, white and gold rounded headings (Fredoka), green and cyan
 ## bars, square item slots, parchment pages for the journal and the Scattered screen.
 class_name UiKit
 extends RefCounted
@@ -113,14 +113,10 @@ static func parchment_style() -> StyleBoxFlat:
 	return s
 
 
-## A slate panel with cyan corner brackets.
+## A translucent dark slate panel.
 static func panel() -> PanelContainer:
 	var p := PanelContainer.new()
 	p.add_theme_stylebox_override("panel", panel_style())
-	var br := Brackets.new()
-	br.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	br.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	p.add_child(br)
 	return p
 
 
@@ -212,23 +208,3 @@ static func dim(alpha: float = 0.55) -> ColorRect:
 	c.color = Color(0.02, 0.01, 0.06, alpha)
 	c.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	return c
-
-
-class Brackets:
-	extends Control
-	func _draw() -> void:
-		var s := size
-		var l := minf(22.0, minf(s.x, s.y) * 0.3)
-		var c := UiKit.CYAN
-		var w := 3.0
-		for corner: Vector2 in [Vector2(0, 0), Vector2(s.x, 0), Vector2(0, s.y), Vector2(s.x, s.y)]:
-			var dx := 1.0 if corner.x == 0 else -1.0
-			var dy := 1.0 if corner.y == 0 else -1.0
-			var p := corner + Vector2(dx * -2, dy * -2)
-			draw_line(p, p + Vector2(dx * l, 0), Color(c, 0.25), w + 4)
-			draw_line(p, p + Vector2(0, dy * l), Color(c, 0.25), w + 4)
-			draw_line(p, p + Vector2(dx * l, 0), c, w)
-			draw_line(p, p + Vector2(0, dy * l), c, w)
-	func _notification(what: int) -> void:
-		if what == NOTIFICATION_RESIZED:
-			queue_redraw()
