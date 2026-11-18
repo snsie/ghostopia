@@ -18,6 +18,7 @@ var gather_nodes: Dictionary = {}      # id -> {data, node (Node3D or null), ali
 var cell_nodes: Dictionary = {}        # Vector3i -> node id
 var fx_nodes: Array[Dictionary] = []   # {node, moods}
 var workbench: Node3D
+var magic_mirror: Node3D
 var sails: Node3D
 var sign_node: Node3D
 var charm_nodes: Dictionary = {}       # object id -> Node3D
@@ -43,6 +44,7 @@ func build(p_world: VoxelWorld) -> void:
 		if by_instance.has(inst["id"]):
 			_make_hauntable(by_instance[inst["id"]], n)
 	_place_workbench()
+	_place_magic_mirror()
 	_build_nodes()
 	_build_fx()
 	sails = _find_prefix(instances.get("windmill_sails_1"), "ANIM_sails")
@@ -188,6 +190,110 @@ func _place_workbench() -> void:
 
 func workbench_pos() -> Vector3:
 	return workbench.global_position + Vector3(0, 0, 0.8) if workbench else Vector3.ZERO
+
+
+func _place_magic_mirror() -> void:
+	magic_mirror = Node3D.new()
+	magic_mirror.name = "magic_mirror"
+	# Opposite the Spectral Workbench in the mausoleum doorway yard, facing north toward the path.
+	magic_mirror.position = Vector3(30.5, 28.0, 96.4)
+	magic_mirror.rotation.y = PI
+	add_child(magic_mirror)
+
+	var frame_mat := StandardMaterial3D.new()
+	frame_mat.albedo_color = Color(0.24, 0.18, 0.34)
+	frame_mat.metallic = 0.55
+	frame_mat.roughness = 0.35
+
+	var trim_mat := StandardMaterial3D.new()
+	trim_mat.albedo_color = Color(0.88, 0.72, 0.36)
+	trim_mat.metallic = 0.75
+	trim_mat.roughness = 0.25
+	trim_mat.emission_enabled = true
+	trim_mat.emission = Color(0.65, 0.5, 0.2)
+	trim_mat.emission_energy_multiplier = 0.3
+
+	# Pedestal base
+	var base := MeshInstance3D.new()
+	var base_cyl := CylinderMesh.new()
+	base_cyl.top_radius = 0.46
+	base_cyl.bottom_radius = 0.54
+	base_cyl.height = 0.18
+	base.mesh = base_cyl
+	base.position = Vector3(0, 0.09, 0)
+	base.material_override = frame_mat
+	magic_mirror.add_child(base)
+
+	# Side pillars
+	for sx in [-0.42, 0.42]:
+		var post := MeshInstance3D.new()
+		var pc := CylinderMesh.new()
+		pc.top_radius = 0.06
+		pc.bottom_radius = 0.075
+		pc.height = 1.65
+		post.mesh = pc
+		post.position = Vector3(sx, 0.95, 0)
+		post.material_override = frame_mat
+		magic_mirror.add_child(post)
+
+		var finial := MeshInstance3D.new()
+		var sp := SphereMesh.new()
+		sp.radius = 0.09
+		sp.height = 0.18
+		finial.mesh = sp
+		finial.position = Vector3(sx, 1.82, 0)
+		finial.material_override = trim_mat
+		magic_mirror.add_child(finial)
+
+	# Outer oval frame
+	var ring := MeshInstance3D.new()
+	var torus := TorusMesh.new()
+	torus.inner_radius = 0.42
+	torus.outer_radius = 0.52
+	ring.mesh = torus
+	ring.position = Vector3(0, 1.12, 0)
+	ring.rotation.x = PI * 0.5
+	ring.scale = Vector3(0.92, 1.0, 1.32)
+	ring.material_override = trim_mat
+	magic_mirror.add_child(ring)
+
+	# Glowing spectral mirror glass
+	var glass := MeshInstance3D.new()
+	var g_cyl := CylinderMesh.new()
+	g_cyl.top_radius = 0.44
+	g_cyl.bottom_radius = 0.44
+	g_cyl.height = 0.05
+	glass.mesh = g_cyl
+	glass.position = Vector3(0, 1.12, 0)
+	glass.rotation.x = PI * 0.5
+	glass.scale = Vector3(0.92, 1.0, 1.32)
+	var glass_mat := ShaderMaterial.new()
+	glass_mat.shader = load("res://shaders/ghost.gdshader")
+	glass_mat.set_shader_parameter("body", Vector3(0.45, 0.78, 1.0))
+	glass_mat.set_shader_parameter("rim", Vector3(0.78, 0.52, 1.0))
+	glass_mat.set_shader_parameter("secondary", Vector3(0.22, 0.14, 0.48))
+	glass_mat.set_shader_parameter("gradient_mode", 3)
+	glass_mat.set_shader_parameter("finish_mode", 1)
+	glass_mat.set_shader_parameter("alpha", 0.88)
+	glass_mat.set_shader_parameter("pulse_speed", 0.8)
+	glass.material_override = glass_mat
+	magic_mirror.add_child(glass)
+
+	var light := OmniLight3D.new()
+	light.light_color = Color(0.68, 0.52, 1.0)
+	light.light_energy = 1.4
+	light.omni_range = 4.5
+	light.position = Vector3(0, 1.15, 0.35)
+	light.shadow_enabled = false
+	magic_mirror.add_child(light)
+
+	var wisps := Fx.wisps(Color(0.75, 0.55, 1.0), 2.5, 2.2, 0.35)
+	wisps.position = Vector3(0, 1.0, 0.1)
+	magic_mirror.add_child(wisps)
+
+
+func mirror_pos() -> Vector3:
+	return magic_mirror.global_position + Vector3(0, 0, -0.7) if magic_mirror else Vector3.ZERO
 
 
 func _build_nodes() -> void:

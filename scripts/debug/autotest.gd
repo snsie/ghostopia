@@ -225,6 +225,12 @@ func _run() -> void:
 	await frames(4)
 	await shot("settings")
 	gw.close_screen()
+	p.teleport(gw.level.mirror_pos() + Vector3(0, 0.6, -0.4), 0.0)
+	await frames(2)
+	check("at_magic_mirror", p.interact() == "mirror" and gw.screen is CharacterizerScreen, "")
+	await frames(4)
+	await shot("magic_mirror")
+	gw.close_screen()
 	check("ui_screens", gw.screen == null and not get_tree().paused, "")
 
 	# --- save and load

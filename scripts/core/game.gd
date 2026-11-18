@@ -8,6 +8,7 @@ signal fragment_found(id: String)
 signal level_up(path: String, level: int, unlock: String)
 signal stats_changed
 signal settings_changed
+signal appearance_changed
 
 const SAVE_PATH := "user://save.json"
 const SETTINGS_PATH := "user://settings.cfg"
@@ -124,6 +125,18 @@ static func _json(path: String) -> Dictionary:
 # ---------------------------------------------------------------- run state
 
 var traits := {"haunting": 0, "drift": 0, "resilience": 0}
+var appearance: Dictionary = GhostAppearance.defaults()
+
+
+func set_appearance(d: Dictionary) -> void:
+	appearance = GhostAppearance.sanitize(d)
+	appearance_changed.emit()
+
+
+func set_appearance_key(key: String, val: Variant) -> void:
+	appearance[key] = val
+	appearance = GhostAppearance.sanitize(appearance)
+	appearance_changed.emit()
 
 
 func trait_rank(id: String) -> int:
@@ -143,7 +156,9 @@ func choose_trait(id: String) -> void:
 	stats_changed.emit()
 
 
-func new_game() -> void:
+func new_game(keep_appearance: bool = false) -> void:
+	if not keep_appearance:
+		appearance = GhostAppearance.defaults()
 	inventory.setup(tuning.d("start"))
 	minds.clear()
 	var over := tuning.d("villager_overrides")
@@ -172,6 +187,7 @@ func new_game() -> void:
 	for k: String in stats:
 		stats[k] = 0
 	stats_changed.emit()
+	appearance_changed.emit()
 
 
 func presence_level() -> Dictionary:
@@ -303,7 +319,7 @@ func save_game(world_edits: Dictionary, extra: Dictionary = {}) -> bool:
 	for k: String in minds:
 		minds_s[k] = (minds[k] as VillagerMind).to_save()
 	var d := {
-		"version": 2, "traits": traits, "saved_at": Time.get_datetime_string_from_system(),
+		"version": 2, "traits": traits, "appearance": appearance, "saved_at": Time.get_datetime_string_from_system(),
 		"world_edits": world_edits, "inventory": inventory.to_save(), "path_fright": path_fright,
 		"presence_fright": presence_fright, "fright_essence": fright_essence, "hp": hp, "ecto": ecto,
 		"fragments": fragments.keys(), "minds": minds_s, "town": town.to_save(), "cycle_t": cycle_t,
@@ -332,6 +348,8 @@ func load_game() -> Dictionary:
 	if d.is_empty():
 		return {}
 	new_game()
+	if d.has("appearance") and d["appearance"] is Dictionary:
+		appearance = GhostAppearance.sanitize(d["appearance"])
 	inventory.from_save(d.get("inventory", {}))
 	for k: String in d.get("path_fright", {}):
 		path_fright[k] = float(d["path_fright"][k])
@@ -358,6 +376,7 @@ func load_game() -> Dictionary:
 		stats[k] = int(d["stats"][k])
 	scares_log = d.get("scares_log", [])
 	stats_changed.emit()
+	appearance_changed.emit()
 	return d
 
 
