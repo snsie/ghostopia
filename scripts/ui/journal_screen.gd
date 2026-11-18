@@ -36,7 +36,7 @@ func _ready() -> void:
 	var sp := Control.new()
 	sp.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	tabs.add_child(sp)
-	for t in [["Memories", "memories"], ["Villagers", "villagers"], ["Legend", "legend"]]:
+	for t in [["Memories", "memories"], ["Villagers", "villagers"], ["Legend", "legend"], ["Haunting", "haunting"]]:
 		var b := UiKit.button(t[0], _set_tab.bind(t[1]))
 		b.custom_minimum_size = Vector2(150, 40)
 		tabs.add_child(b)
@@ -117,6 +117,8 @@ func _set_tab(t: String) -> void:
 			_show_fragment()
 		"villagers":
 			_show_villagers()
+		"haunting":
+			_show_haunting()
 		"legend":
 			_show_legend()
 
@@ -175,12 +177,30 @@ func _show_villagers() -> void:
 		_right.add_child(box)
 
 
+func _show_haunting() -> void:
+	_right.add_child(_ink_heading("Haunting Fright: %d" % int(Game.path_fright["haunting"])))
+	_right.add_child(UiKit.ink_label("Haunt props to build Unease. A successful BOO or a villager bolting earns Fright. Match their fear and scare them while alone and facing away for a better reward.", 17))
+	var descriptions := {
+		"flicker": "Dim or snuff lamps and lanterns to frighten nearby villagers.",
+		"haunted_furniture": "Rock chairs, rattle wardrobes, and tilt portraits.",
+		"bell_ringing": "Ring a bell to startle villagers and animals within earshot.",
+		"object_possession": "Possess dolls or scarecrows and press Space to scare.",
+		"animal_possession": "Possess a cat or dog and press Space to hiss or bark.",
+		"villager_possession": "Possess an isolated, primed villager and press Space to vomit.",
+		"door_slam": "Use strong Haunt on a door to slam it shut.",
+		"blackout": "Snuff a light and up to two lights close to it.",
+		"aftershock": "Your possession scare leaves a second pulse of fear.",
+	}
+	var fright := float(Game.path_fright["haunting"])
+	var next := Game.tuning.next_level("haunting.levels", fright)
+	if next.is_empty():
+		_right.add_child(UiKit.ink_label("All haunting abilities unlocked.", 17))
+	else:
+		_right.add_child(UiKit.ink_label("Next: %s · %d Fright to go" % [next.name, ceili(float(next.fright) - fright)], 19))
+		_right.add_child(UiKit.ink_label(descriptions.get(next.unlock, ""), 17))
+
+
 func _show_legend() -> void:
-	_right.add_child(_ink_heading("Haunting"))
-	for row: Dictionary in Game.tuning.a("haunting.levels"):
-		if not Game.ability_unlocked(row.unlock):
-			_right.add_child(UiKit.ink_label("Next: %s · %d / %d Haunting Fright" % [row.name, Game.path_fright["haunting"], row.fright], 17))
-			break
 	var ln := Game.town.legend_name()
 	_right.add_child(_ink_heading(ln.capitalize() if ln != "" else "No legend yet"))
 	_right.add_child(UiKit.ink_label("Legend points: %d   ·   Heat: %d" % [int(Game.town.legend_points), int(Game.town.heat)], 18))

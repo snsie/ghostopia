@@ -169,7 +169,7 @@ func _build_paths() -> void:
 	var hicon := GhostIcon.new()
 	hicon.custom_minimum_size = Vector2(36, 40)
 	r.add_child(hicon)
-	r.add_child(UiKit.heading("HAUNTING", 22))
+	r.add_child(UiKit.heading("Haunting Fright", 19))
 	haunt_label = UiKit.heading("Lv.1", 22, UiKit.GOLD)
 	haunt_label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	haunt_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
@@ -280,9 +280,11 @@ func _process(_dt: float) -> void:
 	haunt_label.text = "Lv.%d %s" % [lvl, String(cur.get("name", ""))]
 	if nxt.is_empty():
 		haunt_bar.value = 100
+		haunt_label.text = "All abilities unlocked"
 	else:
 		var a := float(cur.get("fright", 0))
 		var b := float(nxt.get("fright", 1))
+		haunt_label.text = "%d Fright to %s" % [ceili(b - f), nxt.get("name", "")]
 		haunt_bar.value = (f - a) / maxf(b - a, 1.0) * 100.0
 	presence_label.text = "Presence Lv.%d · Fright Essence %d" % [int(Game.presence_level().get("level", 1)), int(Game.fright_essence)]
 	heat_bar.value = Game.town.heat

@@ -498,8 +498,16 @@ func say(line: String, seconds: float = 4.5) -> void:
 
 
 ## Stage escalation from an act (glance, "hello?", startle).
+var _scream_after := 0.0
+
+
 func react_stage(stage_before: String, stage_after: String) -> void:
-	if stage_after == stage_before or mode == Mode.PATH:
+	if stage_after == stage_before:
+		return
+	if stage_after in ["scared", "primed"] and stage_before not in ["scared", "primed"] and _now >= _scream_after:
+		Sfx.play_at("scream", head_pos(), -2.0)
+		_scream_after = _now + 12.0
+	if mode == Mode.PATH:
 		return
 	for s in Game.tuning.a("scare.stages"):
 		if s["id"] == stage_after:

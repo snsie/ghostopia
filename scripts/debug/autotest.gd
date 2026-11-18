@@ -85,10 +85,15 @@ func _run() -> void:
 	var p: Player = gw.player
 	log_line("START build %s" % JSON.stringify(gw.build_stats))
 	check("world_built", int(gw.build_stats.get("chunks", 0)) > 100, "chunks=%s faces=%s mesh_ms=%s" % [gw.build_stats.get("chunks"), gw.build_stats.get("faces"), gw.build_stats.get("mesh_ms")])
-	check("villagers_spawned", gw.npcs.size() == 5, "%d" % gw.npcs.size())
+	check("villagers_spawned", gw.npcs.size() == 11, "%d" % gw.npcs.size())
 	check("hauntables_bound", gw.level.hauntables.size() >= 70, "%d" % gw.level.hauntables.size())
 	Game.ecto = 100.0
 	var only: Array = Game.cmd.get("autotest", [])
+	if only.has("haunting"):
+		await _haunting_update()
+		log_line("DONE %d passed, %d failed %s" % [_passes, _fails.size(), str(_fails)])
+		get_tree().quit(0 if _fails.is_empty() else 1)
+		return
 	if only.has("slice"):
 		await _next_slice()
 		log_line("DONE %d passed, %d failed %s" % [_passes, _fails.size(), str(_fails)])
@@ -523,7 +528,7 @@ func _next_slice() -> void:
 	possession.toggle()
 	check("object_possession", possession.host == scarecrow.root)
 	if possession.host:
-		possession.action()
+		_press_host_action(player)
 		await shot("object_possession")
 		possession.release()
 		possession.toggle()
@@ -537,7 +542,7 @@ func _next_slice() -> void:
 	possession.toggle()
 	check("animal_possession", possession.host == dog)
 	if possession.host:
-		possession.action()
+		_press_host_action(player)
 		possession.left = 0.01
 		await wait(0.1)
 		check("animal_timeout", not possession.host and player.model.visible)
@@ -557,7 +562,7 @@ func _next_slice() -> void:
 	possession.toggle()
 	check("villager_possession", possession.host == agnes and agnes.possessed)
 	if possession.host:
-		possession.action()
+		_press_host_action(player)
 		possession.release()
 		check("villager_resumes_schedule", not agnes.possessed)
 	var rooms: Array = gw.CavernSystem.ROOMS
@@ -595,3 +600,82 @@ func _next_slice() -> void:
 	gw.load_game()
 	check("legacy_save_awards_unspent_traits", Game.pending_traits() == 4
 		and Game.trait_rank("drift") == 0 and Game.fragments.size() == 3)
+
+func _press_host_action(player: Player) -> void:
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_SPACE
+	key.pressed = true
+	player._unhandled_input(key)
+	check("space_triggers_host_action_%d" % player.possession.tier, player.possession.acted)
+
+
+func _haunting_update() -> void:
+	var player: Player = gw.player
+	set_time(0.25)
+	var director: ScareDirector = gw.director
+	var agnes: Npc = gw.npc_by_id("agnes")
+	var bell: Hauntable = gw.level.hauntables["bell_1"]
+	check("bell_locked", director.haunt(bell, "ring") == "locked")
+	Game.add_fright(45.0, ["haunting"])
+	for animal: Node3D in player.possession.animals:
+		animal.global_position = bell.world_pos() + Vector3(1, 0, 1)
+	agnes.global_position = bell.world_pos() + Vector3(1, 0, 1)
+	agnes.asleep = false
+	agnes.visible = true
+	var before := agnes.mind.unease
+	check("bell_rings", director.haunt(bell, "ring") == "ok")
+	check("bell_builds_unease", agnes.mind.unease > before)
+	check("bell_startles_animals", player.possession.animal_alarm.size() == 2)
+	check("bell_animates", bell._tween != null and bell._tween.is_running())
+	check("bell_cooldown", director.haunt(bell, "ring") == "cooldown")
+	var tested := {}
+	for h: Hauntable in gw.level.hauntables.values():
+		if h.kind not in ["door", "floorboard", "candle", "oil_lamp", "lantern", "rocking_chair", "wardrobe", "portrait"]:
+			continue
+		if tested.has(h.kind) or not h.root.is_visible_in_tree():
+			continue
+		tested[h.kind] = true
+		h.mood_on = true
+		for action: String in [h.gentle_action(), h.strong_action()]:
+			if action.is_empty():
+				continue
+			h._cooldown_until = 0.0
+			h.set_lit(true)
+			Game.ecto = 100.0
+			agnes.global_position = h.world_pos() + Vector3(0.4, 0, 0)
+			agnes.asleep = false
+			agnes.mind.unease = 0
+			check("haunt_%s_%s" % [h.kind, action], director.haunt(h, action) == "ok")
+			if h.kind != "portrait" and h.data.get("source") != "carried":
+				check("fear_%s_%s" % [h.kind, action], agnes.mind.unease > 0)
+	Game.add_fright(255.0, ["haunting"])
+	check("late_unlocks", Game.ability_unlocked("door_slam") and Game.ability_unlocked("blackout") and Game.ability_unlocked("aftershock"))
+	var door: Hauntable = gw.level.hauntables["lantern_end_door_0"]
+	door._cooldown_until = 0.0
+	Game.ecto = 100
+	check("strong_haunt_slams_door", door.strong_action() == "slam" and director.haunt(door, "slam") == "ok")
+	var first: Hauntable = gw.level.hauntables["lantern_end_light_0"]
+	var second: Hauntable = gw.level.hauntables["lantern_end_light_1"]
+	var third: Hauntable = gw.level.hauntables["lantern_end_light_2"]
+	for light: Hauntable in [first, second, third]:
+		light.mood_on = true
+		light.set_lit(true)
+		light._cooldown_until = 0.0
+	check("blackout_snuffs_nearby_lights", director.haunt(first, "snuff") == "ok" and not second.lit and not third.lit)
+	var ward := TownMemory.new()
+	ward.from_save({"charms": {"door": {"charm": "test", "nights": 3}}, "salt_lines": {"door": {"nights": 3}}})
+	ward.new_night()
+	check("old_charm_expires_at_nightfall", ward.charms.is_empty() and ward.salt_lines.door.nights == 2)
+	for id in ["rowan", "moss"]:
+		var resident: Npc = gw.npc_by_id(id)
+		player.teleport(resident.global_position + Vector3(0, 1, 3), 180)
+		player.aim_at(resident.head_pos())
+		await frames(6)
+		check("district_" + id, String(Game.area_at(resident.global_position).id) in ["lantern_end", "reedcross"])
+		await shot("district_" + id)
+	var sentinel: Node3D = gw.caverns.enemies[2]
+	player.teleport(sentinel.global_position + Vector3(0, 1, -2.5), 0)
+	player.aim_at(sentinel.global_position + Vector3.UP * 1.3)
+	await frames(6)
+	check("sentinel_uses_blender_rig", gw.caverns.sentinel_animation.has_animation("attack_slam"))
+	await shot("blender_crystal_sentinel")

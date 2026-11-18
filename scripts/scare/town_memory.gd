@@ -168,6 +168,8 @@ func from_save(d: Dictionary) -> void:
 	night = int(d.get("night", 0))
 	uses = d.get("uses", {})
 	charms = d.get("charms", {})
+	for id in charms:
+		charms[id]["nights"] = 1
 	salt_lines = d.get("salt_lines", {})
 	legend_points = float(d.get("legend_points", 0.0))
 	epithet_counts = d.get("epithet_counts", {})

@@ -249,7 +249,7 @@ func _unhandled_input(e: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 		return
 	if possession.host:
-		if e.is_action_pressed("haunt"):
+		if e.is_action_pressed("haunt") or e.is_action_pressed("ascend"):
 			possession.action()
 		get_viewport().set_input_as_handled()
 		return
@@ -508,7 +508,7 @@ func _update_targets() -> void:
 		var h: Hauntable = level.hauntables[id]
 		if not is_instance_valid(h.root) or not h.root.is_visible_in_tree():
 			continue
-		if not bool(h.data.get("slice_active", false)) and h.ability() != "haunted_furniture":
+		if not bool(h.data.get("slice_active", false)) and h.ability() not in ["haunted_furniture", "bell_ringing"]:
 			continue
 		var p := h.world_pos()
 		if p.distance_to(global_position) > rng:

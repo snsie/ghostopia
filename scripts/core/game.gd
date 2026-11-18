@@ -67,6 +67,7 @@ func _ready() -> void:
 	blocks = BlockRegistry.load_file()
 	layout = _json(LAYOUT)
 	population = _json(POPULATION)
+	preload("res://scripts/world/districts.gd").register(layout, population)
 	fragments_data = _json(FRAGMENTS)
 	for entry in [
 		["fungal_grotto", "The Spore Keeper's Promise", "I left the brightest cap untouched. Some lights belong to the dark."],
@@ -188,7 +189,7 @@ func haunting_level() -> int:
 func ability_unlocked(ability: String) -> bool:
 	for row in tuning.a("haunting.levels"):
 		if row.get("unlock") == ability:
-			return haunting_level() >= int(row["level"]) and not row.get("slice_locked", false)
+			return float(path_fright["haunting"]) >= float(row["fright"]) and not row.get("slice_locked", false)
 	return false
 
 
