@@ -68,6 +68,12 @@ func _ready() -> void:
 	layout = _json(LAYOUT)
 	population = _json(POPULATION)
 	fragments_data = _json(FRAGMENTS)
+	for entry in [
+		["fungal_grotto", "The Spore Keeper's Promise", "I left the brightest cap untouched. Some lights belong to the dark."],
+		["flooded_ossuary", "The Ferryman's Lantern", "I lit the lantern for the last crossing and waited until dawn."],
+		["crystal_hollow", "The Prospector's Echo", "The stones sang my name back to me, only softer."],
+	]:
+		fragments_data["fragments"].append({"id": entry[0], "owner_name": entry[1], "vignette": entry[1], "text": entry[2], "emotion": "nostalgia", "set": null})
 	characters = _json(CHARACTERS).get("characters", {})
 	fragment_roller.setup(fragments_data)
 	for f in fragments_data.get("fragments", []):
@@ -116,6 +122,26 @@ static func _json(path: String) -> Dictionary:
 
 # ---------------------------------------------------------------- run state
 
+var traits := {"haunting": 0, "drift": 0, "resilience": 0}
+
+
+func trait_rank(id: String) -> int:
+	return int(traits.get(id, 0))
+
+
+func pending_traits() -> int:
+	return maxi(0, int(presence_level().get("level", 1)) - 1 - trait_rank("haunting") - trait_rank("drift") - trait_rank("resilience"))
+
+
+func choose_trait(id: String) -> void:
+	if not traits.has(id) or pending_traits() == 0:
+		return
+	traits[id] += 1
+	if id == "resilience":
+		hp = minf(max_hp(), hp + 2.0)
+	stats_changed.emit()
+
+
 func new_game() -> void:
 	inventory.setup(tuning.d("start"))
 	minds.clear()
@@ -126,6 +152,8 @@ func new_game() -> void:
 	town.setup(population.get("town_memory", {}), areas)
 	fragments.clear()
 	path_fright = {"haunting": 0.0, "possession": 0.0, "telekinesis": 0.0}
+	for id in traits:
+		traits[id] = 0
 	presence_fright = 0.0
 	fright_essence = 0.0
 	hp = max_hp()
@@ -150,7 +178,7 @@ func presence_level() -> Dictionary:
 
 
 func max_hp() -> float:
-	return float(presence_level().get("hp", tuning.f("player.hp_base", 10.0)))
+	return float(presence_level().get("hp", tuning.f("player.hp_base", 10.0))) + 2.0 * trait_rank("resilience")
 
 
 func haunting_level() -> int:
@@ -265,12 +293,16 @@ func seconds_until_night() -> float:
 
 # ---------------------------------------------------------------- save / load
 
+func save_path() -> String:
+	return "user://autotest-save.json" if has_flag("autotest") else SAVE_PATH
+
+
 func save_game(world_edits: Dictionary, extra: Dictionary = {}) -> bool:
 	var minds_s := {}
 	for k: String in minds:
 		minds_s[k] = (minds[k] as VillagerMind).to_save()
 	var d := {
-		"version": 1, "saved_at": Time.get_datetime_string_from_system(),
+		"version": 2, "traits": traits, "saved_at": Time.get_datetime_string_from_system(),
 		"world_edits": world_edits, "inventory": inventory.to_save(), "path_fright": path_fright,
 		"presence_fright": presence_fright, "fright_essence": fright_essence, "hp": hp, "ecto": ecto,
 		"fragments": fragments.keys(), "minds": minds_s, "town": town.to_save(), "cycle_t": cycle_t,
@@ -278,9 +310,9 @@ func save_game(world_edits: Dictionary, extra: Dictionary = {}) -> bool:
 		"nodes_state": nodes_state, "dropped_essence": dropped_essence, "stats": stats, "scares_log": scares_log,
 	}
 	d.merge(extra, true)
-	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var f := FileAccess.open(save_path(), FileAccess.WRITE)
 	if f == null:
-		push_error("Game: can't write %s" % SAVE_PATH)
+		push_error("Game: can't write %s" % save_path())
 		return false
 	f.store_string(JSON.stringify(d, "\t"))
 	f.close()
@@ -288,14 +320,14 @@ func save_game(world_edits: Dictionary, extra: Dictionary = {}) -> bool:
 
 
 func has_save() -> bool:
-	return FileAccess.file_exists(SAVE_PATH)
+	return FileAccess.file_exists(save_path())
 
 
 ## Restores the run state; returns the save dictionary (world edits and extras for the world).
 func load_game() -> Dictionary:
 	if not has_save():
 		return {}
-	var d := _json(SAVE_PATH)
+	var d := _json(save_path())
 	if d.is_empty():
 		return {}
 	new_game()
@@ -304,7 +336,9 @@ func load_game() -> Dictionary:
 		path_fright[k] = float(d["path_fright"][k])
 	presence_fright = float(d.get("presence_fright", 0.0))
 	fright_essence = float(d.get("fright_essence", 0.0))
-	hp = float(d.get("hp", max_hp()))
+	for id in traits:
+		traits[id] = maxi(0, int(d.get("traits", {}).get(id, 0)))
+	hp = clampf(float(d.get("hp", max_hp())), 0.0, max_hp())
 	ecto = float(d.get("ecto", 100.0))
 	for id in d.get("fragments", []):
 		fragments[String(id)] = true
@@ -368,7 +402,7 @@ func _bus_vol(bus: String, v: float) -> void:
 const KEYS := {
 	"move_forward": [KEY_W, KEY_UP], "move_back": [KEY_S, KEY_DOWN], "move_left": [KEY_A, KEY_LEFT],
 	"move_right": [KEY_D, KEY_RIGHT], "ascend": [KEY_SPACE], "sink": [KEY_CTRL, KEY_C], "fast": [KEY_SHIFT],
-	"haunt": [KEY_E], "haunt_strong": [KEY_R], "boo": [KEY_F], "interact": [KEY_Q],
+	"possess": [KEY_G], "haunt": [KEY_E], "haunt_strong": [KEY_R], "boo": [KEY_F], "interact": [KEY_Q],
 	"journal": [KEY_J], "inventory": [KEY_TAB, KEY_I], "pause": [KEY_ESCAPE],
 	"slot_1": [KEY_1], "slot_2": [KEY_2], "slot_3": [KEY_3], "slot_4": [KEY_4], "slot_5": [KEY_5],
 	"slot_6": [KEY_6], "slot_7": [KEY_7], "slot_8": [KEY_8], "slot_9": [KEY_9],
@@ -377,7 +411,7 @@ const MOUSE := {"use": MOUSE_BUTTON_LEFT, "place": MOUSE_BUTTON_RIGHT}
 const PAD := {"use": JOY_BUTTON_RIGHT_SHOULDER, "place": JOY_BUTTON_LEFT_SHOULDER, "ascend": JOY_BUTTON_A,
 	"sink": JOY_BUTTON_B, "haunt": JOY_BUTTON_X, "haunt_strong": JOY_BUTTON_Y, "boo": JOY_BUTTON_RIGHT_STICK,
 	"pause": JOY_BUTTON_START, "inventory": JOY_BUTTON_BACK, "interact": JOY_BUTTON_DPAD_UP,
-	"journal": JOY_BUTTON_DPAD_DOWN}
+	"journal": JOY_BUTTON_DPAD_DOWN, "possess": JOY_BUTTON_DPAD_RIGHT}
 
 
 func _build_input_map() -> void:

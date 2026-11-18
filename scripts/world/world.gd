@@ -12,6 +12,9 @@ var daynight: DayNight
 var hud: Hud
 var npcs: Array[Npc] = []
 var ui_layer: CanvasLayer
+const CavernSystem = preload("res://scripts/world/caverns.gd")
+var caverns: Node3D
+var _conversation_at := 0.0
 var screen: Control          # the open modal screen (journal, inventory, pause...) or null
 var title: TitleScreen
 var started := false
@@ -90,6 +93,7 @@ func start_game(load_save: bool) -> void:
 	world.name = "VoxelWorld"
 	add_child(world)
 	world.load_level(Game.layout, Game.blocks, Game.tuning.f("world.vertex_jitter_m", 0.035))
+	CavernSystem.carve(world)
 	if save.has("world_edits"):
 		world.apply_edits(save["world_edits"])
 	build_stats = world.build_all()
@@ -123,6 +127,9 @@ func start_game(load_save: bool) -> void:
 	hud.setup(self)
 	director.graded.connect(hud.show_grade)
 	player.scattered.connect(_on_scattered)
+	caverns = CavernSystem.new()
+	add_child(caverns)
+	caverns.setup(self)
 	_make_outline()
 	player.teleport(Game.player_pos, Game.player_yaw)
 	director.restore_memory_visuals()
@@ -199,12 +206,33 @@ func _process(dt: float) -> void:
 		for n in npcs:
 			n.tick(dt, now)
 		level.tick_nodes(dt)
+		caverns.tick(dt)
+		_try_conversation(now)
 	_amb_t -= dt
 	if _amb_t <= 0.0:
 		_amb_t = 0.5
-		Sfx.ambience(daynight.ambience_for(player.global_position))
+		Sfx.ambience({} if caverns.active >= 0 else daynight.ambience_for(player.global_position))
 		var ph := Game.phase()
-		Sfx.music("night_theme" if ph in ["night", "dusk"] else "day_theme")
+		if caverns.active >= 0:
+			Sfx.music(CavernSystem.ROOMS[caverns.active].id)
+		else:
+			Sfx.music("night_theme" if ph in ["night", "dusk"] else "day_theme")
+
+
+func _try_conversation(now: float) -> void:
+	if now < _conversation_at:
+		return
+	_conversation_at = now + 4.0
+	for i in npcs.size():
+		var first: Npc = npcs[i]
+		if not first.available_to_chat() or first.global_position.distance_to(player.global_position) > 12.0:
+			continue
+		for j in range(i + 1, npcs.size()):
+			var second: Npc = npcs[j]
+			if second.available_to_chat() and first.global_position.distance_to(second.global_position) < 2.2:
+				first.chat_with(second, now)
+				_conversation_at = now + 30.0
+				return
 
 
 func _cycle_events(prev: float, t: float) -> void:
@@ -249,7 +277,7 @@ func avg_fps() -> float:
 func _unhandled_input(e: InputEvent) -> void:
 	if not started or title:
 		return
-	if screen != null:
+	if screen != null or player.possession.host:
 		return
 	if e.is_action_pressed("pause"):
 		open_pause()
@@ -371,6 +399,7 @@ func load_game() -> void:
 	if not Game.has_save():
 		hud.hint("No save yet")
 		return
+	player.possession.release()
 	var save := Game.load_game()
 	world.apply_edits(save.get("world_edits", {}))
 	world.remesh_now()

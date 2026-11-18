@@ -32,7 +32,14 @@ var _punch := 0.0
 
 var auto_move := Vector2.ZERO      # autotest/tour input override (x = right, y = forward)
 var auto_vertical := 0.0           # +1 ascend, -1 sink
-var input_enabled := true
+var input_enabled := true:
+	set(value):
+		input_enabled = value
+		if not value:
+			_clear_sprint_taps()
+var _direction_taps: Dictionary = {}
+var possession: Node
+var _sprint_key: Key = KEY_NONE
 var phasing := false
 var manifest_left := 0.0
 var scattered_now := false
@@ -122,6 +129,11 @@ func setup(p_gw: Node) -> void:
 		if m["kind"] == "shelter":
 			_shelters.append(m)
 	Game.inventory.changed.connect(_refresh_tool)
+	Game.stats_changed.connect(_refresh_evolution)
+	_refresh_evolution()
+	possession = (load("res://scripts/actors/possession.gd") as GDScript).new()
+	add_child(possession)
+	possession.setup(self)
 	_refresh_tool()
 
 
@@ -173,6 +185,56 @@ func set_look(yaw: float, pitch: float) -> void:
 	_pitch = pitch
 
 
+func _refresh_evolution() -> void:
+	var haunting := Game.trait_rank("haunting")
+	var drift := Game.trait_rank("drift")
+	var resilience := Game.trait_rank("resilience")
+	if eyes:
+		if haunting > 0:
+			var material := StandardMaterial3D.new()
+			material.albedo_color = Color(0.68, 0.28, 1.0)
+			material.emission_enabled = true
+			material.emission = material.albedo_color
+			material.emission_energy_multiplier = 0.5 + 0.4 * haunting
+			eyes.material_override = material
+		else:
+			eyes.material_override = null
+	sheet_mat.set_shader_parameter("drift_rank", float(drift))
+	sheet_mat.set_shader_parameter("resilience_rank", float(resilience))
+
+
+func _clear_sprint_taps() -> void:
+	_direction_taps.clear()
+	_sprint_key = KEY_NONE
+
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_APPLICATION_FOCUS_OUT:
+		_clear_sprint_taps()
+
+
+func _input(event: InputEvent) -> void:
+	if not event is InputEventKey or event.echo:
+		return
+	var key: Key = event.physical_keycode
+	if not event.pressed:
+		if _sprint_key == key:
+			_sprint_key = KEY_NONE
+		return
+	if not input_enabled or scattered_now or Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+		_clear_sprint_taps()
+		return
+	for direction in ["move_left", "move_right", "move_forward", "move_back"]:
+		if not event.is_action_pressed(direction):
+			continue
+		var now := Time.get_ticks_msec()
+		var previous: int = _direction_taps.get(key, -1000)
+		_direction_taps[key] = now
+		if now - previous <= 250:
+			_sprint_key = key
+		break
+
+
 func _unhandled_input(e: InputEvent) -> void:
 	if not input_enabled or scattered_now:
 		return
@@ -182,7 +244,16 @@ func _unhandled_input(e: InputEvent) -> void:
 		_yaw -= e.relative.x * sens
 		_pitch = clampf(_pitch - e.relative.y * sens * inv, deg_to_rad(Game.tuning.f("camera.pitch_min_deg", -70)),
 			deg_to_rad(Game.tuning.f("camera.pitch_max_deg", 55)))
-	elif e is InputEventMouseButton and e.pressed:
+	if e.is_action_pressed("possess"):
+		possession.toggle()
+		get_viewport().set_input_as_handled()
+		return
+	if possession.host:
+		if e.is_action_pressed("haunt"):
+			possession.action()
+		get_viewport().set_input_as_handled()
+		return
+	if e is InputEventMouseButton and e.pressed:
 		if e.button_index == MOUSE_BUTTON_WHEEL_UP:
 			Game.inventory.selected = posmod(Game.inventory.selected - 1, 9)
 			_refresh_tool()
@@ -206,7 +277,14 @@ func _unhandled_input(e: InputEvent) -> void:
 
 
 func _physics_process(dt: float) -> void:
+	possession.update(dt)
+	if possession.host:
+		velocity = Vector3.ZERO
+		_tick_state(dt, Vector3.ZERO, 0.0)
+		_update_camera(dt, false)
+		return
 	if scattered_now:
+		_clear_sprint_taps()
 		_update_camera(dt, false)
 		return
 	var inp := Vector2.ZERO
@@ -218,7 +296,9 @@ func _physics_process(dt: float) -> void:
 			vert = 1.0
 		elif Input.is_action_pressed("sink"):
 			vert = -1.0
-		fast = Input.is_action_pressed("fast")
+		if Input.mouse_mode != Input.MOUSE_MODE_CAPTURED:
+			_clear_sprint_taps()
+		fast = Input.is_action_pressed("fast") or _sprint_key != KEY_NONE
 		var rs := Vector2(Input.get_joy_axis(0, JOY_AXIS_RIGHT_X), Input.get_joy_axis(0, JOY_AXIS_RIGHT_Y))
 		if rs.length() > 0.2:
 			var s := deg_to_rad(Game.tuning.f("camera.stick_sensitivity_deg_s", 160)) * dt
@@ -230,6 +310,7 @@ func _physics_process(dt: float) -> void:
 	var basis_y := Basis(Vector3.UP, _yaw)
 	var wish := basis_y * Vector3(inp.x, 0, -inp.y)
 	var spd := t.f("player.fast_speed_mps", 5.2) if fast else t.f("player.move_speed_mps", 3.2)
+	spd *= 1.0 + 0.05 * Game.trait_rank("drift")
 	var hv := Vector3(velocity.x, 0, velocity.z).lerp(wish * spd, clampf(dt * t.f("player.accel", 9.0), 0.0, 1.0))
 	# vertical: hover over the first solid cell below, glide down, ascend with Ectoplasm, sink to phase
 	var feet := global_position
@@ -288,6 +369,9 @@ func _tick_state(dt: float, hv: Vector3, vy: float) -> void:
 			indoors = true
 			break
 	sheltered = world.natural_cover(global_position + Vector3(0, 0.3, 0)) >= t.i("player.shelter_needs_natural_blocks_above", 2)
+	if gw.caverns and gw.caverns.room_at(global_position) >= 0:
+		sheltered = true
+		indoors = true
 	for m in _shelters:
 		var p: Array = m["pos"]
 		if global_position.distance_to(Vector3(p[0], p[1], p[2])) < float(m.get("radius", 1.5)) + 1.5:
@@ -303,9 +387,10 @@ func _tick_state(dt: float, hv: Vector3, vy: float) -> void:
 			sheet_mat.set_shader_parameter("hurt", 1.0)
 			create_tween().tween_method(func(v: float) -> void: sheet_mat.set_shader_parameter("hurt", v), 1.0, 0.0, 0.5)
 			Sfx.play("hurt", -10.0)
-		if Game.hp <= 0.0:
-			scatter()
-			return
+	if Game.hp <= 0.0:
+		possession.release()
+		scatter()
+		return
 	# manifest
 	if manifest_left > 0.0:
 		manifest_left -= dt
@@ -373,6 +458,8 @@ func _update_camera(dt: float, snap: bool) -> void:
 	# inside a phaseable block the camera ignores phaseable walls so it stays behind the ghost
 	spring.collision_mask = VoxelWorld.L_SOLID if phasing else (VoxelWorld.L_SOLID | VoxelWorld.L_PHASE)
 	cam_yaw.global_position = global_position + Vector3(0, t.f("camera.height_m", 0.9), 0)
+	if possession and possession.host:
+		cam_yaw.global_position = possession.host.global_position + Vector3.UP * 0.8
 	cam_yaw.rotation = Vector3(0, _yaw, 0)
 	cam_pitch.rotation = Vector3(_pitch, 0, 0)
 	xray_mat.set_shader_parameter("strength", 1.0 if phasing else 0.35)
@@ -421,7 +508,7 @@ func _update_targets() -> void:
 		var h: Hauntable = level.hauntables[id]
 		if not is_instance_valid(h.root) or not h.root.is_visible_in_tree():
 			continue
-		if not bool(h.data.get("slice_active", false)):
+		if not bool(h.data.get("slice_active", false)) and h.ability() != "haunted_furniture":
 			continue
 		var p := h.world_pos()
 		if p.distance_to(global_position) > rng:
@@ -564,6 +651,8 @@ func do_boo() -> Dictionary:
 
 
 func interact() -> String:
+	if gw.caverns and gw.caverns.interact():
+		return "cavern"
 	if level.workbench and global_position.distance_to(level.workbench_pos()) < Game.tuning.f("workbench_reach_m", 3.0):
 		gw.open_inventory(true)
 		return "workbench"

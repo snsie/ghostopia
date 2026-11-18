@@ -460,9 +460,9 @@ func show_grade(res: Dictionary) -> void:
 func _on_level_up(path: String, level: int, unlock: String) -> void:
 	Sfx.play("level_up")
 	if path == "haunting":
-		toast("Haunting level %d! You can now %s." % [level, unlock.capitalize() if unlock != "" else "do more"], "level")
+		toast("Haunting level %d! You can now %s." % [level, unlock.replace("_", " ").capitalize() if unlock != "" else "do more"], "level")
 	else:
-		toast("Presence level %d: more HP, a wider scare and longer manifesting" % level, "level")
+		toast("Presence level %d · Choose a ghost trait in Inventory" % level, "level")
 
 
 func _on_fragment(id: String) -> void:

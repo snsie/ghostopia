@@ -89,6 +89,11 @@ func _run() -> void:
 	check("hauntables_bound", gw.level.hauntables.size() >= 70, "%d" % gw.level.hauntables.size())
 	Game.ecto = 100.0
 	var only: Array = Game.cmd.get("autotest", [])
+	if only.has("slice"):
+		await _next_slice()
+		log_line("DONE %d passed, %d failed %s" % [_passes, _fails.size(), str(_fails)])
+		get_tree().quit(0 if _fails.is_empty() else 1)
+		return
 	if only.has("scare"):
 		await _scares()
 		log_line("DONE %d passed, %d failed %s" % [_passes, _fails.size(), str(_fails)])
@@ -159,7 +164,7 @@ func _run() -> void:
 	gw._cycle_events(0.075, 0.085)
 	check("new_night", Game.nights == nights + 1, "night %d" % Game.nights)
 	if FileAccess.file_exists(Game.SAVE_PATH):
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(Game.SAVE_PATH))
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(Game.save_path()))
 	gw._cycle_events(0.575, 0.585)
 	check("dawn_autosave", Game.has_save(), "")
 	set_time(0.62)
@@ -225,7 +230,7 @@ func _run() -> void:
 	var bones := Game.inventory.count("bone")
 	var frags := Game.fragments.size()
 	var legend := Game.town.legend_points
-	check("save", gw.save_game(), ProjectSettings.globalize_path(Game.SAVE_PATH))
+	check("save", gw.save_game(), ProjectSettings.globalize_path(Game.save_path()))
 	gw.world.set_block(c, before)
 	Game.inventory.remove("bone", 3)
 	gw.load_game()
@@ -468,3 +473,125 @@ func _scares() -> void:
 	check("botched_boo", String(res3.get("outcome", "")) == "botch" and bram.mind.nerve > n0, "%s %s" % [res3.get("outcome"), res3.get("reason")])
 	await wait(0.6)
 	await shot("botch_bram")
+
+
+func _next_slice() -> void:
+	var player: Player = gw.player
+	set_time(0.25)
+	check("flicker_initially_locked", not Game.ability_unlocked("flicker"))
+	Game.add_fright(10, ["haunting"])
+	check("flicker_after_first_spook", Game.ability_unlocked("flicker") and Game.pending_traits() == 1)
+	Game.add_fright(65, ["haunting"])
+	Game.choose_trait("haunting")
+	Game.choose_trait("drift")
+	Game.choose_trait("resilience")
+	check("stacked_evolution", Game.pending_traits() == 0 and Game.max_hp() == 18.0)
+	await shot("evolved_ghost")
+	gw.open_inventory(false)
+	await frames(3)
+	var inventory: InventoryScreen = gw.screen
+	for i in Inventory.TOOLS.size():
+		inventory._select_slot(i + 5)
+		inventory._assign(Inventory.TOOLS[i])
+		check("assign_" + Inventory.TOOLS[i], Game.inventory.selected_id() == Inventory.TOOLS[i]
+			and Game.inventory.hotbar.count(Inventory.TOOLS[i]) == 1)
+	await shot("tool_hotbar")
+	gw.close_screen()
+	Input.mouse_mode = Input.MOUSE_MODE_CAPTURED
+	var key := InputEventKey.new()
+	key.physical_keycode = KEY_W
+	key.pressed = true
+	player._input(key)
+	key.pressed = false
+	player._input(key)
+	key.pressed = true
+	player._input(key)
+	check("double_tap_sprint", player._sprint_key == KEY_W)
+	key.pressed = false
+	player._input(key)
+	check("release_ends_sprint", player._sprint_key == KEY_NONE)
+	player._input(InputEventKey.new())
+	player._notification(NOTIFICATION_APPLICATION_FOCUS_OUT)
+	check("focus_loss_resets_sprint", player._direction_taps.is_empty())
+	Input.mouse_mode = Input.MOUSE_MODE_VISIBLE
+	var possession: Node = player.possession
+	var scarecrow: Hauntable = gw.level.hauntables["scarecrow_1"]
+	var point := scarecrow.root.global_position
+	player.teleport(point + Vector3(0, 0.9, 2.5), 180.0)
+	player.aim_at(point + Vector3.UP * 1.15)
+	await frames(12)
+	possession.toggle()
+	check("object_possession", possession.host == scarecrow.root)
+	if possession.host:
+		possession.action()
+		await shot("object_possession")
+		possession.release()
+		possession.toggle()
+		check("possession_cooldown", possession.host == null)
+	Game.add_fright(25, ["haunting"])
+	check("animal_unlock", Game.ability_unlocked("animal_possession") and not Game.ability_unlocked("villager_possession"))
+	var dog: Node3D = possession.animals[0]
+	var dog_pos := dog.global_position
+	player.teleport(dog_pos + Vector3(0, 1.0, 1.3), 180.0)
+	player.aim_at(dog_pos + Vector3.UP * 0.35)
+	possession.toggle()
+	check("animal_possession", possession.host == dog)
+	if possession.host:
+		possession.action()
+		possession.left = 0.01
+		await wait(0.1)
+		check("animal_timeout", not possession.host and player.model.visible)
+	Game.add_fright(50, ["haunting"])
+	var agnes: Npc = gw.npc_by_id("agnes")
+	for n: Npc in gw.npcs:
+		n.visible = n == agnes
+		n._hidden_until = 1.0e10 if n != agnes else 0.0
+	agnes.global_position = Vector3(55.5, ground(55.5, 82.5), 82.5)
+	agnes.asleep = false
+	agnes.mode = Npc.Mode.SCHEDULE
+	agnes._investigate_after = 0.0
+	agnes.mind.unease = agnes.mind.nerve * 0.9
+	var agnes_pos := agnes.global_position
+	player.teleport(agnes_pos + Vector3(0, 1.0, 1.6), 180.0)
+	player.aim_at(agnes.head_pos())
+	possession.toggle()
+	check("villager_possession", possession.host == agnes and agnes.possessed)
+	if possession.host:
+		possession.action()
+		possession.release()
+		check("villager_resumes_schedule", not agnes.possessed)
+	var rooms: Array = gw.CavernSystem.ROOMS
+	for i in rooms.size():
+		var room: Dictionary = rooms[i]
+		var c := Vector3(room.center) + Vector3(0.5, 0, 0.5)
+		player.teleport(Vector3(c.x, room.surface + 0.15, c.z - 3), 180.0)
+		check("enter_" + room.id, player.interact() == "cavern")
+		player.aim_at(c + Vector3(0, 1.0, 1.8))
+		await wait(0.65)
+		check("cave_shelter_" + room.id, player.sheltered and gw.caverns.active == i)
+		await shot(room.id)
+		if i == 1:
+			var enemy: Node3D = gw.caverns.enemies[i]
+			player.teleport(enemy.global_position, 180.0)
+			var health := Game.hp
+			await wait(1.7)
+			check("enemy_telegraphs_and_damages", Game.hp < health)
+			Game.hp = Game.max_hp()
+		player.teleport(c + Vector3(3.2, 1, 0), 180.0)
+		await frames(5)
+		check("memory_" + room.id, Game.fragments.has(room.id))
+		player.teleport(c + Vector3(0, 0.9, -3), 180.0)
+		check("exit_" + room.id, player.interact() == "cavern")
+	check("save_slice", gw.save_game())
+	gw.load_game()
+	check("reload_slice", Game.fragments.size() == 3 and Game.trait_rank("drift") == 1
+		and Game.inventory.hotbar[5] == "scythe")
+	var legacy := Game._json(Game.save_path())
+	legacy.erase("traits")
+	legacy["version"] = 1
+	var legacy_file := FileAccess.open(Game.save_path(), FileAccess.WRITE)
+	legacy_file.store_string(JSON.stringify(legacy))
+	legacy_file.close()
+	gw.load_game()
+	check("legacy_save_awards_unspent_traits", Game.pending_traits() == 4
+		and Game.trait_rank("drift") == 0 and Game.fragments.size() == 3)

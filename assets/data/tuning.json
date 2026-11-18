@@ -55,19 +55,22 @@
     "_note": "Shared level fed by all Fright. Raises HP, scare (BOO) radius and manifest time.",
     "levels": [
       {"level": 1, "fright": 0,   "hp": 10, "scare_radius_m": 4.0, "manifest_s": 1.6},
-      {"level": 2, "fright": 60,  "hp": 12, "scare_radius_m": 4.6, "manifest_s": 2.0},
-      {"level": 3, "fright": 160, "hp": 14, "scare_radius_m": 5.2, "manifest_s": 2.4},
-      {"level": 4, "fright": 320, "hp": 16, "scare_radius_m": 5.8, "manifest_s": 2.8},
-      {"level": 5, "fright": 560, "hp": 18, "scare_radius_m": 6.4, "manifest_s": 3.2}
+      {"level": 2, "fright": 10,  "hp": 12, "scare_radius_m": 4.6, "manifest_s": 2.0},
+      {"level": 3, "fright": 35, "hp": 14, "scare_radius_m": 5.2, "manifest_s": 2.4},
+      {"level": 4, "fright": 75, "hp": 16, "scare_radius_m": 5.8, "manifest_s": 2.8},
+      {"level": 5, "fright": 140, "hp": 18, "scare_radius_m": 6.4, "manifest_s": 3.2}
     ]
   },
 
   "haunting": {
-    "_note": "Haunting path. Level 1 Creak (doors, floorboards), level 2 Flicker (candles, lamps, lanterns). Level 3+ is shown but not playable in the slice.",
+    "_note": "Haunting path: Creak, Flicker, and Haunted Furniture.",
     "levels": [
       {"level": 1, "fright": 0,   "unlock": "creak",   "name": "Creak"},
-      {"level": 2, "fright": 25,  "unlock": "flicker", "name": "Flicker"},
-      {"level": 3, "fright": 150, "unlock": "haunted_furniture", "name": "Haunted Furniture", "slice_locked": true}
+      {"level": 2, "fright": 10,  "unlock": "flicker", "name": "Flicker"},
+      {"level": 3, "fright": 35, "unlock": "haunted_furniture", "name": "Haunted Furniture"},
+      {"level": 4, "fright": 60, "unlock": "object_possession", "name": "Object Possession"},
+      {"level": 5, "fright": 100, "unlock": "animal_possession", "name": "Animal Possession"},
+      {"level": 6, "fright": 150, "unlock": "villager_possession", "name": "Villager Possession"}
     ],
     "range_m": 7.0,
     "aim_cone_deg": 14.0,
