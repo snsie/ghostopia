@@ -17,6 +17,8 @@ var ap: AnimationPlayer
 var eyes: MeshInstance3D
 var sheet_mat: ShaderMaterial
 var xray_mat: ShaderMaterial
+var glow_light: OmniLight3D
+var appearance_fx: Node3D
 var tool_socket: Node3D
 var tool_node: Node3D
 var tool_id := ""
@@ -102,14 +104,14 @@ func setup(p_gw: Node) -> void:
 	for m in meshes:
 		if m is VisualInstance3D:
 			(m as VisualInstance3D).layers = 2
-	var glow := OmniLight3D.new()
-	glow.light_cull_mask = 1
-	glow.light_color = Color(0.62, 0.86, 1.0)
-	glow.light_energy = 0.6
-	glow.omni_range = 3.5
-	glow.position.y = 0.4
-	glow.shadow_enabled = false
-	add_child(glow)
+	glow_light = OmniLight3D.new()
+	glow_light.light_cull_mask = 1
+	glow_light.light_color = Color(0.62, 0.86, 1.0)
+	glow_light.light_energy = 0.6
+	glow_light.omni_range = 3.5
+	glow_light.position.y = 0.4
+	glow_light.shadow_enabled = false
+	add_child(glow_light)
 	_build_camera()
 	_crack = MeshInstance3D.new()
 	var bm := BoxMesh.new()
@@ -130,6 +132,7 @@ func setup(p_gw: Node) -> void:
 			_shelters.append(m)
 	Game.inventory.changed.connect(_refresh_tool)
 	Game.stats_changed.connect(_refresh_evolution)
+	Game.appearance_changed.connect(_refresh_appearance)
 	_refresh_evolution()
 	possession = (load("res://scripts/actors/possession.gd") as GDScript).new()
 	add_child(possession)
@@ -186,21 +189,23 @@ func set_look(yaw: float, pitch: float) -> void:
 
 
 func _refresh_evolution() -> void:
-	var haunting := Game.trait_rank("haunting")
 	var drift := Game.trait_rank("drift")
 	var resilience := Game.trait_rank("resilience")
-	if eyes:
-		if haunting > 0:
-			var material := StandardMaterial3D.new()
-			material.albedo_color = Color(0.68, 0.28, 1.0)
-			material.emission_enabled = true
-			material.emission = material.albedo_color
-			material.emission_energy_multiplier = 0.5 + 0.4 * haunting
-			eyes.material_override = material
-		else:
-			eyes.material_override = null
 	sheet_mat.set_shader_parameter("drift_rank", float(drift))
 	sheet_mat.set_shader_parameter("resilience_rank", float(resilience))
+	_refresh_appearance()
+
+
+func _refresh_appearance() -> void:
+	var haunting := Game.trait_rank("haunting")
+	GhostAppearance.apply_to_materials(Game.appearance, sheet_mat, eyes, glow_light, haunting)
+	if appearance_fx and is_instance_valid(appearance_fx):
+		appearance_fx.queue_free()
+		appearance_fx = null
+	if model:
+		appearance_fx = GhostAppearance.build_fx_node(Game.appearance)
+		if appearance_fx:
+			model.add_child(appearance_fx)
 
 
 func _clear_sprint_taps() -> void:
@@ -439,12 +444,13 @@ func _play_clip(clip: String, lock: float) -> void:
 
 
 func set_expression(key: String, seconds: float) -> void:
-	for k in ["angry", "scared", "happy", "closed"]:
-		Actors.set_shape(eyes, k, 1.0 if k == key else 0.0)
+	if key == "":
+		GhostAppearance.apply_expression(eyes, String(Game.appearance.get("expression", "calm")))
+	else:
+		GhostAppearance.apply_expression(eyes, key)
 	if seconds > 0.0:
 		get_tree().create_timer(seconds).timeout.connect(func() -> void:
-			for k in ["angry", "scared", "happy", "closed"]:
-				Actors.set_shape(eyes, k, 0.0))
+			GhostAppearance.apply_expression(eyes, String(Game.appearance.get("expression", "calm"))))
 
 
 func _update_camera(dt: float, snap: bool) -> void:
@@ -653,6 +659,9 @@ func do_boo() -> Dictionary:
 func interact() -> String:
 	if gw.caverns and gw.caverns.interact():
 		return "cavern"
+	if near_mirror():
+		gw.open_characterizer(false)
+		return "mirror"
 	if level.workbench and global_position.distance_to(level.workbench_pos()) < Game.tuning.f("workbench_reach_m", 3.0):
 		gw.open_inventory(true)
 		return "workbench"
@@ -667,6 +676,10 @@ func interact() -> String:
 
 func near_workbench() -> bool:
 	return level.workbench != null and global_position.distance_to(level.workbench_pos()) < Game.tuning.f("workbench_reach_m", 3.0)
+
+
+func near_mirror() -> bool:
+	return level.magic_mirror != null and global_position.distance_to(level.mirror_pos()) < Game.tuning.f("mirror_reach_m", 2.8)
 
 
 func scatter() -> void:

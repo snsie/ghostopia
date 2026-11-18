@@ -337,6 +337,8 @@ func _update_target() -> void:
 			txt = "%s  ·  out" % nm
 		else:
 			txt = "%s   [E] %s   [R] %s" % [nm, g.replace("_", " ").capitalize(), s.replace("_", " ").capitalize()]
+	elif pl.near_mirror():
+		txt = "[Q] Magic Mirror"
 	elif pl.near_workbench():
 		txt = "[Q] Spectral Workbench"
 	elif pl.global_position.distance_to(_respawn()) < 3.0:
@@ -476,6 +478,9 @@ func _on_fragment(id: String) -> void:
 
 class GhostIcon:
 	extends Control
+	func _ready() -> void:
+		if Engine.get_main_loop() and Game != null:
+			Game.appearance_changed.connect(queue_redraw)
 	func _draw() -> void:
 		var s := size
 		var c := Vector2(s.x * 0.5, s.y * 0.42)
@@ -490,10 +495,14 @@ class GhostIcon:
 			var x := c.x + r - (2.0 * r) * float(i + 1) / 4.0
 			pts.append(Vector2(x + r * 0.25, bottom))
 			pts.append(Vector2(x, bottom - r * 0.25))
-		draw_colored_polygon(pts, Color(0.95, 0.97, 1.0))
-		draw_polyline(pts + PackedVector2Array([pts[0]]), Color(0.55, 0.85, 1.0, 0.8), 2.0)
-		draw_circle(c + Vector2(-r * 0.35, 0), r * 0.16, Color(0.08, 0.06, 0.15))
-		draw_circle(c + Vector2(r * 0.35, 0), r * 0.16, Color(0.08, 0.06, 0.15))
+		var app: Dictionary = Game.appearance if Game != null else {}
+		var body_col := Color(String(app.get("body_color", "#f2f7ff")))
+		var rim_col := Color(String(app.get("rim_color", "#8cd9ff")))
+		var eye_col := Color(String(app.get("eye_color", "#140f26")))
+		draw_colored_polygon(pts, body_col)
+		draw_polyline(pts + PackedVector2Array([pts[0]]), Color(rim_col.r, rim_col.g, rim_col.b, 0.85), 2.0)
+		draw_circle(c + Vector2(-r * 0.35, 0), r * 0.16, eye_col)
+		draw_circle(c + Vector2(r * 0.35, 0), r * 0.16, eye_col)
 
 
 class MoonClock:

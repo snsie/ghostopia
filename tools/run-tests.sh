@@ -13,8 +13,8 @@ set -uo pipefail
 cd "$(dirname "$0")/.."
 GODOT="${GODOT:-/c/Tools/Godot/godot_console.exe}"
 
-if [ ! -d .godot ]; then
-  echo "Importing project (first run)..."
+if [ ! -d .godot ] || ! grep -q "GhostAppearance" .godot/global_script_class_cache.cfg 2>/dev/null; then
+  echo "Importing project..."
   "$GODOT" --headless --path . --import >/dev/null 2>&1 || true
 fi
 

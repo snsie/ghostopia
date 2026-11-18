@@ -50,7 +50,7 @@ func show_title() -> void:
 	title = TitleScreen.new()
 	ui_layer.add_child(title)
 	title.continue_pressed.connect(func() -> void: _start_from_title(true))
-	title.new_game_pressed.connect(func() -> void: _start_from_title(false))
+	title.new_game_pressed.connect(func() -> void: open_characterizer(true))
 	title.settings_pressed.connect(func() -> void: open_screen(Menus.settings(close_screen)))
 	title.quit_pressed.connect(quit_game)
 
@@ -79,7 +79,7 @@ func _show_loading(text: String) -> void:
 	ui_layer.add_child(_loading)
 
 
-func start_game(load_save: bool) -> void:
+func start_game(load_save: bool, keep_appearance: bool = false) -> void:
 	_show_loading("Drifting into the Veil…")
 	await get_tree().process_frame
 	await get_tree().process_frame
@@ -87,7 +87,7 @@ func start_game(load_save: bool) -> void:
 	if load_save:
 		save = Game.load_game()
 	else:
-		Game.new_game()
+		Game.new_game(keep_appearance)
 	var t0 := Time.get_ticks_msec()
 	world = VoxelWorld.new()
 	world.name = "VoxelWorld"
@@ -323,6 +323,25 @@ func open_inventory(at_workbench: bool) -> void:
 	inv.at_workbench = at_workbench
 	inv.closed.connect(close_screen)
 	open_screen(inv)
+
+
+func open_characterizer(for_new_game: bool) -> void:
+	if for_new_game:
+		Game.set_appearance(GhostAppearance.defaults())
+	var ch := CharacterizerScreen.new()
+	ch.is_new_game = for_new_game
+	if for_new_game:
+		ch.confirmed.connect(func() -> void:
+			close_screen()
+			if title:
+				title.queue_free()
+				title = null
+			await start_game(false, true))
+		ch.cancelled.connect(close_screen)
+	else:
+		ch.confirmed.connect(close_screen)
+		ch.cancelled.connect(close_screen)
+	open_screen(ch)
 
 
 func open_pause() -> void:
