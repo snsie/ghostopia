@@ -1,0 +1,65 @@
+{
+ "id": "barrow_warrior",
+ "generator": "blender/scripts/build_battle_units.py",
+ "units": "metres, Godot axes (x right, y up, faces +Z)",
+ "vertex_count": 648,
+ "index_count": 972,
+ "mesh": "res://assets/battle/units/barrow_warrior_mesh.bin",
+ "mesh_layout": "float32 positions[vc*3], float32 normals[vc*3], float32 colors[vc*4], uint32 indices[ic]",
+ "vat": "res://assets/battle/units/barrow_warrior_vat.bin",
+ "vat_format": "RGBAH (float16 x4), width = vertex_count, height = 2 * frames; rows [0,F) positions, [F,2F) normals",
+ "vat_size": [
+  648,
+  92
+ ],
+ "frames": 46,
+ "clips": {
+  "idle": {
+   "start": 0,
+   "frames": 16,
+   "fps": 15.0,
+   "loop": true,
+   "length_s": 1.0666666666666667
+  },
+  "walk": {
+   "start": 16,
+   "frames": 12,
+   "fps": 15.0,
+   "loop": true,
+   "length_s": 0.8
+  },
+  "attack": {
+   "start": 28,
+   "frames": 10,
+   "fps": 15.0,
+   "loop": false,
+   "length_s": 0.6666666666666666
+  },
+  "flee": {
+   "start": 38,
+   "frames": 8,
+   "fps": 15.0,
+   "loop": true,
+   "length_s": 0.5333333333333333
+  }
+ },
+ "clip_order": [
+  "idle",
+  "walk",
+  "attack",
+  "flee"
+ ],
+ "bounds": {
+  "min": [
+   -0.7411453074502379,
+   -0.06184038380093837,
+   -0.47856364274744456
+  ],
+  "max": [
+   0.8794416812851829,
+   2.1469604192356746,
+   1.05983333247224
+  ]
+ },
+ "height_m": 2.1469604192356746
+}

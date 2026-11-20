@@ -13,6 +13,7 @@ var hud: Hud
 var npcs: Array[Npc] = []
 var ui_layer: CanvasLayer
 const CavernSystem = preload("res://scripts/world/caverns.gd")
+const BATTLE_SCENE := "res://scenes/battle.tscn"
 var caverns: Node3D
 var _conversation_at := 0.0
 var screen: Control          # the open modal screen (journal, inventory, pause...) or null
@@ -36,6 +37,10 @@ func _ready() -> void:
 	ui_layer.layer = 10
 	add_child(ui_layer)
 	get_tree().auto_accept_quit = false
+	if Game.has_flag("battle") or Game.has_flag("battle-bench") or Game.has_flag("battle-parity"):
+		# battle prototype arena (scripts/battle/battle_world.gd), separate from the Millbrook slice
+		get_tree().change_scene_to_file.call_deferred(BATTLE_SCENE)
+		return
 	if Game.has_flag("autotest") or Game.has_flag("tour"):
 		await start_game(false)
 		var script_path := "res://scripts/debug/autotest.gd" if Game.has_flag("autotest") else "res://scripts/debug/tour.gd"
@@ -49,6 +54,7 @@ func _ready() -> void:
 func show_title() -> void:
 	title = TitleScreen.new()
 	ui_layer.add_child(title)
+	title.battle_pressed.connect(func() -> void: get_tree().change_scene_to_file(BATTLE_SCENE))
 	title.continue_pressed.connect(func() -> void: _start_from_title(true))
 	title.new_game_pressed.connect(func() -> void: open_characterizer(true))
 	title.settings_pressed.connect(func() -> void: open_screen(Menus.settings(close_screen)))

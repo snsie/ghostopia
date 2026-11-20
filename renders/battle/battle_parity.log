@@ -1,0 +1,15 @@
+t=  0.0 CPU | clan 0 fight 500 rout   0 out   0 routs   0 scat   0 eng   0 | clan 1 fight 500 rout   0 out   0 routs   0 scat   0 eng   0
+t=  0.0 GPU | clan 0 fight   0 rout   0 out   0 routs   0 scat   0 eng   0 | clan 1 fight   0 rout   0 out   0 routs   0 scat   0 eng   0
+t= 10.0 CPU | clan 0 fight 500 rout   0 out   0 routs   0 scat   0 eng   0 | clan 1 fight 500 rout   0 out   0 routs   0 scat   0 eng   0
+t= 10.0 GPU | clan 0 fight 500 rout   0 out   0 routs   0 scat   0 eng   0 | clan 1 fight 500 rout   0 out   0 routs   0 scat   0 eng   0
+t= 20.0 CPU | clan 0 fight 500 rout   0 out   0 routs   0 scat   0 eng 129 | clan 1 fight 500 rout   0 out   0 routs   0 scat   0 eng 122
+t= 20.0 GPU | clan 0 fight 500 rout   0 out   0 routs   0 scat   0 eng 128 | clan 1 fight 500 rout   0 out   0 routs   0 scat   0 eng 120
+t= 30.0 CPU | clan 0 fight 495 rout   0 out   5 routs   0 scat   6 eng 146 | clan 1 fight 490 rout   0 out  10 routs   0 scat  10 eng 141
+t= 30.0 GPU | clan 0 fight 497 rout   0 out   3 routs   0 scat   3 eng 147 | clan 1 fight 492 rout   0 out   8 routs   0 scat   8 eng 145
+t= 40.0 CPU | clan 0 fight 474 rout   0 out  26 routs   0 scat  26 eng 156 | clan 1 fight 468 rout   0 out  32 routs   0 scat  32 eng 156
+t= 40.0 GPU | clan 0 fight 470 rout   0 out  30 routs   0 scat  30 eng 149 | clan 1 fight 461 rout   0 out  39 routs   0 scat  39 eng 152
+t= 50.0 CPU | clan 0 fight 449 rout   0 out  51 routs   0 scat  51 eng 148 | clan 1 fight 443 rout   0 out  57 routs   0 scat  57 eng 160
+t= 50.0 GPU | clan 0 fight 450 rout   0 out  50 routs   0 scat  50 eng 145 | clan 1 fight 443 rout   0 out  57 routs   0 scat  57 eng 151
+END CPU | clan 0 fight 428 rout   0 out  72 routs   0 scat  72 eng 146 | clan 1 fight 420 rout   0 out  80 routs   0 scat  80 eng 151
+END GPU | clan 0 fight 426 rout   0 out  74 routs   0 scat  74 eng 145 | clan 1 fight 419 rout   0 out  81 routs   0 scat  81 eng 154
+worst relative difference 0.027 (CPU 15.98 ms per step)

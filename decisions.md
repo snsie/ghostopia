@@ -452,3 +452,108 @@ Every choice made without asking Scott. Newest sections at the bottom. Later tas
   - macOS: universal zip, ad-hoc signed with Godot's built-in signer, not notarized; ETC2/ASTC import is enabled for
     Apple Silicon.
   - Only the needed export templates were unpacked.
+
+
+## Battle prototype (2026-11-19/20): Underveil battle-fun gate — Scott may revisit any of these
+
+Branch `battle-prototype`, kept separate from the Millbrook slice (title screen button "Battle prototype: the Sunken
+Ford", or `-- --battle`). Brief: `docs/design/underveil-handoff.md`.
+
+**Open questions built with the proposed answers (handoff: don't block on them):**
+
+- Scattering an undead pays **materials, not Fright** (a hint shows "+1 drowned silver / barrow bronze"; no inventory
+  items exist for them yet, so nothing is added). Scares still don't pay Fright in the prototype either: the arena
+  has no save and doesn't touch the surface run.
+- The Hollow-sinking origin, the five-clan cast, the Bonewardens' stance and the Underveil clock don't touch the
+  prototype; nothing was built for them.
+- Underground is always shaded: the arena has a natural stone ceiling, so the ghost never takes daylight drain there.
+
+**Arena and units (pipeline: Blender writes data, Godot reads it):**
+
+- `blender/scripts/build_battle_arena.py` writes the Sunken Ford arena: 128 × 32 × 128 voxels, floor at y 7, ceiling
+  at y 24, a 2-deep running river across z 58–66, one 28-wide still-water ford (x 50–78) with the Memory Vein in its
+  bed and the ceiling, 6 pillars, the Parish bell tower (north) and a Barrow mound (south), home tunnels north/south.
+  It also writes `sunken_ford_population.json`: 500 Drowned Parish (north) vs 500 Barrow Host (south), symmetric
+  formations 12 m from the river (asymmetric fronts made whoever crossed first lose, issues.md).
+- The arena only needs numpy, so it also runs as plain `python`; it stays in `blender/scripts/` with the generators.
+- `blender/scripts/build_battle_units.py`: placeholder soldiers from coloured boxes (flat shaded, voxel style), rigid
+  parts animated in code and **baked into vertex-animation textures** (positions + normals, RGBA half floats):
+  idle 16, walk 12, attack 10, flee 8 frames at 15 fps. Vertex colour alpha 0 marks glowing parts (eyes, candles).
+  Mesh and VAT are raw binaries + JSON (no glTF/EXR importers involved); `UnitKit` builds the ArrayMesh and texture.
+- The **same mesh and VAT drive the crowd and the near actors** (the actors are not rigged glTFs yet), so promotion
+  never pops. Rigged clan characters come with run 2 content.
+
+**Crowd simulation:**
+
+- One unit = 20 floats (`scripts/battle/crowd_layout.gd`), identical in the CPU reference
+  (`crowd_sim_cpu.gd`), the GPU compute shader (`shaders/crowd/crowd_sim.glsl`), the near tier and the readback.
+- GPU: one compute shader with three passes (clear, bin, step) on the **main RenderingDevice** (Forward+), run via
+  `RenderingServer.call_on_render_thread`. Units ping-pong between two storage buffers. The step pass writes each
+  unit's transform + custom data **straight into its clan's MultiMesh buffer** (`multimesh_get_buffer_rd_rid`), so the
+  CPU never reads positions. The CPU reads back only the summary (72 uints) and the nearby list around the ghost
+  (8 distance bands × 40 units) every 4 frames, asynchronously (`buffer_get_data_async`).
+- Spatial hash: 2.5 m cells, 48 units max per cell (fixed buckets with atomics, no sort).
+- Melee damage goes through **two accumulators swapped by frame parity** (fixed point 1/256 on the GPU): a blow lands
+  at the strike point of the attack clip (0.33 s) and is applied to the target on the next step. No write races.
+- Flow fields: Dijkstra per clan goal on the 1 m grid, baked once (~0.5 s for 4 fields). **Both clans' attack goal is
+  the ford** (the Memory Vein they fight over); routing units follow a home field to their tunnel and leave the field.
+  Barrow units can't enter running water; the Parish wade it at 0.6× speed (flow cost 4× per metre).
+- **Crowd pressure:** a unit with more than 3 neighbours inside its separation radius loses 20 % of its forward
+  desire per extra neighbour (down to 15 %). Without it the armies compressed to 9 units/m² at the ford (issues.md).
+- `--crowd cpu|gpu` forces a path. `--autotest` and headless tests use the CPU reference (no RenderingDevice
+  headless); the game and `--battle-bench` use the GPU when one exists. A Web build would need the CPU path.
+
+**Rules and numbers (tuning.json `battle`, tuned with `tools/battle_probe.gd`):**
+
+- Form and Resolve 0–100. Melee 2.5 damage per swing every ~1.5 s; hits lower Resolve by 0.4 × damage; a unit below
+  40 Resolve is shaken and takes 1.5× damage. Calm units (no enemy within 2.4 m, nobody breaking nearby) regain
+  0.5 Resolve/s. Result without the ghost: a 3–4 minute grind at the ford with almost no routs.
+- **Fear spreads by share, not by count:** Resolve lost to breaking allies is scaled by the fraction of allies within
+  2.4 m that are routing (15/s if all are), plus a one-off shock when an ally breaks (40 × share) or is scattered
+  (20 × share). A fixed per-neighbour shock behaved like bootstrap percolation in dense blocks and collapsed whole
+  armies from one rout (issues.md).
+- Clan modifiers are live per-clan blocks (speed, regen bonus, **scare mult**, damage, water walker, **contagion
+  mult**). The Parish deal 1.1× damage to balance the ford geometry.
+- **The Parish bells** (their fear: silence): ringing gives the Parish +0.5 Resolve/s regen, scares × 0.85 and
+  contagion × 0.6. E at the bell tower (within 9 m) silences them for 45 s: a clan-wide −12 Resolve shock, regen bonus
+  off, scares and contagion × 1.8. Then "a bell-ringer climbs back up" and they ring again.
+- **BOO** in battle: a 5 m hit sphere at the ghost, 30 Form and 100 Resolve at the centre (60 % falloff to the edge),
+  multiplied by each clan's scare mult. Same Ecto cost and cooldown as on the surface. Measured on the CPU probe at
+  t = 48 s: alone with the bells ringing ~3–20 routs in 10 s; after silencing ~130–160 (a flank breaks); silence
+  alone breaks nobody.
+- **Telekinesis:** E lifts a boulder within 8 m (15 Ecto), E again throws it along the reticle; impact = 2.4 m sphere,
+  70 Form, 22 Resolve. 14 boulders lie on both banks and come back 20 s after a throw.
+- **Tools** hit near actors only (everything within reach is promoted): scythe 24 to every actor in a 110° sweep,
+  shovel 30, sledgehammer 48 to the one nearest the reticle (+25 % per tier). A swing also takes 0.35 × damage off
+  Resolve. In the arena a swing never mines blocks.
+- Undead the ghost has hit or BOOed are angry for 6 s and swing at it in reach (0.6 HP). Scattered: back at the
+  start of the ghost's bank after 3 s with full HP.
+- **Grading:** each scare (BOO, silence, boulder) counts the routs in the next 10 s (a newer scare closes the
+  previous window): Spooked 10, Terrified 40, Legendary 100. A clan with under 25 % of its soldiers still fighting
+  loses the battle.
+
+**Near tier:**
+
+- The 32 units nearest the ghost (promote within 9 m, demote beyond 12 m, at most 4 swaps per selection, farthest
+  out when a candidate is 2.5 m closer) become `NearActor` nodes (CharacterBody3D, collision on the actors layer).
+- Promotion is a **flag on the unit (`ACTOR`), not a state**: the crowd skips stepping and drawing it but still sees its
+  real state, so it fights actors, separates from them, and feels them break (the cascade through the ghost's
+  surroundings needs this).
+- Actors step every frame in a small CPU sim (the same `CrowdSimCpu`) with the crowd units around them from the latest
+  snapshot as frozen neighbours (positions carried forward by velocity). Actor → crowd blows become single-target
+  hit spheres; crowd → actor blows are applied on the CPU at the attacker's swing rate when its target is the actor
+  (the crowd's own accumulator for an actor is discarded). A crowd unit that broke since the last snapshot shocks the
+  actors once.
+- **GPU promotion is two-phase:** the near tier asks the GPU for a unit; the GPU accepts it only if it is still
+  fighting or routing, freezes it as pending (ACTOR 0.5, still drawn) and the CPU builds the actor from that exact
+  record in the next readback (~0.1 s). Promoting straight from a few-frames-old snapshot could resurrect a unit that
+  had just died (issues.md). Pending units the CPU never takes are released after 90 frames. The CPU crowd promotes
+  directly (its snapshot is current).
+- Actors are positioned from their record each frame (no `move_and_slide`); physics collision is only for queries.
+  Read is the HUD panel (clan, Form, Resolve, shaken); possession and dialogue are not in the prototype.
+
+**Presentation:** a cavern environment (dark violet ambient, light fog, glow), votive lights on the Parish bank,
+bronze lantern posts on the Barrow bank, violet vein lights at the ford. Units cast no shadows. Routing units turn
+pale cyan and wave their arms; scattering units swell, drift up and dissolve. Line breaks play a scream/gasp chorus.
+The HUD shows each clan's strength and **per-flank Resolve** (west/east of the ford centre) so the player can read
+which flank is wavering, plus the bell state.

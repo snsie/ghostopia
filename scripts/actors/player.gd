@@ -605,6 +605,9 @@ func try_mine() -> String:
 	face_aim()
 	_swing_left = t.f("mining.swing_s", 0.42)
 	_play_clip(_tool_clip(tool), _swing_left)
+	if gw.has_method("tool_swing"):
+		# battle arena: swings hit undead, never blocks (scripts/battle/battle_world.gd)
+		return gw.tool_swing(self, tool, tier)
 	if not target_node.is_empty():
 		return gw.gather.hit_node(String(target_node["id"]), tool, tier, self)
 	if not target_block.get("hit", false):
@@ -729,6 +732,10 @@ func respawn() -> void:
 
 
 func _respawn_at_mausoleum() -> void:
+	if gw.has_method("respawn_point"):
+		var rp: Array = gw.respawn_point()
+		teleport(rp[0], rp[1])
+		return
 	var r: Dictionary = Game.markers_by_id.get("respawn", {})
 	var p: Array = r.get("pos", [24.9, 28.0, 92.5])
 	teleport(Vector3(p[0], p[1] + 0.2, p[2]), float(r.get("yaw", 90.0)))

@@ -1,0 +1,493 @@
+{
+ "name": "sunken_ford_arena",
+ "version": 1,
+ "generator": "blender/scripts/build_battle_arena.py",
+ "units": "metres; 1 block = 1 m; Godot axes: x east, y up, z south",
+ "note": "Battle prototype arena (placeholder geometry). Not part of the Millbrook slice.",
+ "world": {
+  "size": [
+   128,
+   32,
+   128
+  ],
+  "chunk_size": 16,
+  "floor_y": 7,
+  "ceiling_y": 24,
+  "voxels": {
+   "path": "res://assets/levels/sunken_ford_voxels.bin",
+   "encoding": "gzip",
+   "order": "x fastest, then z, then y: index = x + sx * (z + sz * y)"
+  }
+ },
+ "river": {
+  "z": [
+   58,
+   66
+  ],
+  "ford_x": [
+   50,
+   78
+  ],
+  "block": "river_water",
+  "running_water": true,
+  "ford_block": "still_water"
+ },
+ "kill_y": -8.0,
+ "spawn": {
+  "player_start": [
+   64.0,
+   7.2,
+   52.0
+  ],
+  "yaw": 180.0
+ },
+ "markers": [
+  {
+   "kind": "bell",
+   "id": "parish_bells",
+   "pos": [
+    64.5,
+    16.0,
+    13.5
+   ],
+   "clan": "drowned_parish",
+   "haunt_range_m": 9.0
+  },
+  {
+   "kind": "vein",
+   "id": "sunken_ford_vein",
+   "pos": [
+    64.0,
+    7,
+    62.0
+   ]
+  },
+  {
+   "kind": "mound",
+   "id": "barrow_mound",
+   "pos": [
+    64.5,
+    9.6,
+    112.5
+   ]
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_0",
+   "pos": [
+    75.38,
+    7.0,
+    49.05
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_1",
+   "pos": [
+    80.0,
+    7.0,
+    52.13
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_2",
+   "pos": [
+    84.41,
+    7.0,
+    50.79
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_3",
+   "pos": [
+    42.5,
+    7.0,
+    51.2
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_4",
+   "pos": [
+    57.74,
+    7.0,
+    50.85
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_5",
+   "pos": [
+    71.83,
+    7.0,
+    54.18
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_6",
+   "pos": [
+    49.41,
+    7.0,
+    54.19
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_7",
+   "pos": [
+    76.72,
+    7.0,
+    69.6
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_8",
+   "pos": [
+    65.13,
+    7.0,
+    73.46
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_9",
+   "pos": [
+    87.01,
+    7.0,
+    70.98
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_10",
+   "pos": [
+    49.06,
+    7.0,
+    71.53
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_11",
+   "pos": [
+    80.7,
+    7.0,
+    72.54
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_12",
+   "pos": [
+    42.93,
+    7.0,
+    73.0
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "throwable",
+   "id": "boulder_13",
+   "pos": [
+    70.92,
+    7.0,
+    75.92
+   ],
+   "radius": 0.45
+  },
+  {
+   "kind": "light",
+   "style": "votive",
+   "pos": [
+    20.5,
+    7.4,
+    50.5
+   ],
+   "color": "#ffad5c",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "bronze_lantern",
+   "pos": [
+    27.5,
+    8.6,
+    76.5
+   ],
+   "color": "#ffc46b",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "votive",
+   "pos": [
+    34.5,
+    7.4,
+    50.5
+   ],
+   "color": "#ffad5c",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "bronze_lantern",
+   "pos": [
+    41.5,
+    8.6,
+    76.5
+   ],
+   "color": "#ffc46b",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "votive",
+   "pos": [
+    48.5,
+    7.4,
+    50.5
+   ],
+   "color": "#ffad5c",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "bronze_lantern",
+   "pos": [
+    55.5,
+    8.6,
+    76.5
+   ],
+   "color": "#ffc46b",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "votive",
+   "pos": [
+    62.5,
+    7.4,
+    50.5
+   ],
+   "color": "#ffad5c",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "bronze_lantern",
+   "pos": [
+    69.5,
+    8.6,
+    76.5
+   ],
+   "color": "#ffc46b",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "votive",
+   "pos": [
+    76.5,
+    7.4,
+    50.5
+   ],
+   "color": "#ffad5c",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "bronze_lantern",
+   "pos": [
+    83.5,
+    8.6,
+    76.5
+   ],
+   "color": "#ffc46b",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "votive",
+   "pos": [
+    90.5,
+    7.4,
+    50.5
+   ],
+   "color": "#ffad5c",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "bronze_lantern",
+   "pos": [
+    97.5,
+    8.6,
+    76.5
+   ],
+   "color": "#ffc46b",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "votive",
+   "pos": [
+    104.5,
+    7.4,
+    50.5
+   ],
+   "color": "#ffad5c",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "bronze_lantern",
+   "pos": [
+    111.5,
+    8.6,
+    76.5
+   ],
+   "color": "#ffc46b",
+   "range": 9.0,
+   "energy": 1.1
+  },
+  {
+   "kind": "light",
+   "style": "vein",
+   "pos": [
+    48.5,
+    8.0,
+    62.0
+   ],
+   "color": "#b38cff",
+   "range": 11.0,
+   "energy": 1.4
+  },
+  {
+   "kind": "light",
+   "style": "vein",
+   "pos": [
+    56.5,
+    8.0,
+    62.0
+   ],
+   "color": "#b38cff",
+   "range": 11.0,
+   "energy": 1.4
+  },
+  {
+   "kind": "light",
+   "style": "vein",
+   "pos": [
+    64.5,
+    8.0,
+    62.0
+   ],
+   "color": "#b38cff",
+   "range": 11.0,
+   "energy": 1.4
+  },
+  {
+   "kind": "light",
+   "style": "vein",
+   "pos": [
+    72.5,
+    8.0,
+    62.0
+   ],
+   "color": "#b38cff",
+   "range": 11.0,
+   "energy": 1.4
+  },
+  {
+   "kind": "light",
+   "style": "vein",
+   "pos": [
+    80.5,
+    8.0,
+    62.0
+   ],
+   "color": "#b38cff",
+   "range": 11.0,
+   "energy": 1.4
+  },
+  {
+   "kind": "light",
+   "style": "votive",
+   "pos": [
+    64.5,
+    17.5,
+    13.5
+   ],
+   "color": "#ffad5c",
+   "range": 12.0,
+   "energy": 1.6
+  },
+  {
+   "kind": "light",
+   "style": "bronze_lantern",
+   "pos": [
+    64.5,
+    11.0,
+    112.5
+   ],
+   "color": "#ffc46b",
+   "range": 14.0,
+   "energy": 1.6
+  }
+ ],
+ "pillars": [
+  [
+   34,
+   46
+  ],
+  [
+   94,
+   47
+  ],
+  [
+   30,
+   80
+  ],
+  [
+   98,
+   79
+  ],
+  [
+   64,
+   32
+  ],
+  [
+   64,
+   94
+  ]
+ ]
+}

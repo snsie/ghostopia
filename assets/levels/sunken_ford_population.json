@@ -1,0 +1,75 @@
+{
+ "name": "sunken_ford_battle",
+ "generator": "blender/scripts/build_battle_arena.py",
+ "note": "Two clans of about 500 each for the battle-fun gate. Formation rects are [x0, z0, x1, z1].",
+ "clans": [
+  {
+   "id": "drowned_parish",
+   "name": "Drowned Parish",
+   "unit": "parish_soldier",
+   "count": 500,
+   "formation": {
+    "rect": [
+     34,
+     20,
+     94,
+     46
+    ],
+    "spacing_m": 1.15,
+    "facing_yaw": 0.0
+   },
+   "home": {
+    "rect": [
+     56,
+     0,
+     72,
+     5
+    ],
+    "tunnel_x": [
+     56,
+     72
+    ],
+    "side": "north"
+   },
+   "color": "#ffad5c",
+   "tint": "#7fb5c4",
+   "water_walker": true,
+   "fear": "silence",
+   "fear_object": "parish_bells"
+  },
+  {
+   "id": "barrow_host",
+   "name": "Barrow Host",
+   "unit": "barrow_warrior",
+   "count": 500,
+   "formation": {
+    "rect": [
+     34,
+     78,
+     94,
+     104
+    ],
+    "spacing_m": 1.15,
+    "facing_yaw": 180.0
+   },
+   "home": {
+    "rect": [
+     56,
+     123,
+     72,
+     128
+    ],
+    "tunnel_x": [
+     56,
+     72
+    ],
+    "side": "south"
+   },
+   "color": "#ffc46b",
+   "tint": "#c49a6a",
+   "water_walker": false,
+   "fear": "namelessness",
+   "fear_object": null
+  }
+ ]
+}

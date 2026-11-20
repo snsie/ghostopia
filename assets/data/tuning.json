@@ -260,5 +260,46 @@
     "exposure_mult": 0.85
   },
 
+  "battle": {
+    "_note": "Battle prototype (Underveil battle-fun gate). 'crowd' feeds the CPU and GPU crowd sims (scripts/battle/crowd_params.gd); Form and Resolve are 0-100. Contagion (rout_drain/shock, scatter_shock) is scaled by the share of nearby allies breaking. Tuned with tools/battle_probe.gd: no ghost = a 2-3 minute grind with no routs; a BOO with the bells ringing spooks a few; silence then BOO breaks a flank (~120-140 routs).",
+    "crowd": {
+      "form": 100, "resolve": 100, "speed": 1.7, "flee_speed": 2.6, "accel": 6.0,
+      "sep_radius": 0.85, "sep_strength": 2.6, "engage": 2.4, "reach": 1.15,
+      "attack_cd": 1.5, "attack_dmg": 2.5, "strike_at": 0.33, "attack_clip_s": 0.667,
+      "hit_resolve_k": 0.4, "shaken_below": 40.0, "shaken_mult": 1.5,
+      "fear_radius": 2.4, "rout_drain": 15.0, "rout_shock": 40.0, "scatter_shock": 20.0, "regen": 0.5,
+      "dissolve_s": 0.8, "wade_mult": 0.6, "wade_sink": 0.45, "cell_m": 2.5, "cell_cap": 48, "press_free": 3.0, "press_k": 0.2,
+      "water_cost": 4.0
+    },
+    "clans": {
+      "drowned_parish": {"speed_mult": 1.0, "regen_bonus": 0.0, "fear_mult": 1.0, "dmg_mult": 1.1},
+      "barrow_host": {"speed_mult": 1.0, "regen_bonus": 0.0, "fear_mult": 1.0, "dmg_mult": 1.0}
+    },
+    "bells": {
+      "_note": "The Drowned Parish fears silence. Ringing bells steady them (scares x ringing_fear_mult, panic spreading x ringing_contagion_mult); silencing them (haunt the bell tower) shakes the whole clan and puts their fear in play (both x1.8) until a bell-ringer climbs back up.",
+      "ringing_regen_bonus": 0.5, "ringing_fear_mult": 0.85, "ringing_contagion_mult": 0.6,
+      "silence_s": 45.0, "silence_shock": 12.0, "silenced_fear_mult": 1.8, "silenced_contagion_mult": 1.8,
+      "haunt_range_m": 9.0, "ring_every_s": 3.0
+    },
+    "ghost": {
+      "boo_radius_m": 5.0, "boo_form": 30.0, "boo_resolve": 100.0, "boo_falloff": 0.6,
+      "throw_ecto": 15.0, "throw_range_m": 8.0, "throw_speed_mps": 16.0, "throw_radius_m": 2.4,
+      "throw_form": 70.0, "throw_resolve": 22.0, "throw_respawn_s": 20.0,
+      "tool_reach_m": 2.4, "tool_cone_deg": 40.0, "scythe_sweep_deg": 110.0,
+      "tool_dmg": {"scythe": 24.0, "shovel": 30.0, "sledgehammer": 48.0},
+      "tool_tier_bonus": 0.25, "tool_resolve_k": 0.35,
+      "hurt_by_unit": 0.6, "aggro_s": 6.0
+    },
+    "near": {
+      "count": 32, "promote_radius_m": 9.0, "demote_radius_m": 12.0, "readback_every_frames": 4
+    },
+    "grade": {
+      "window_s": 10.0, "spooked": 10, "terrified": 40, "legendary": 100,
+      "win_ratio": 0.75
+    },
+    "attack_goal": "ford",
+    "cpu_fallback_scale": 1.0
+  },
+
   "villager_overrides": {}
 }

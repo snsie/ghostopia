@@ -7,6 +7,7 @@ signal continue_pressed
 signal new_game_pressed
 signal settings_pressed
 signal quit_pressed
+signal battle_pressed
 
 const IMG_SIZE := Vector2(1672, 941)
 # Menu buttons in image pixels (concept/ui/title_screen.png).
@@ -62,6 +63,11 @@ func _ready() -> void:
 		b.focus_exited.connect(func() -> void: glow.visible = false)
 		b.pressed.connect(_on_pressed.bind(key))
 		_buttons[key] = b
+	var battle := UiKit.button("Battle prototype: the Sunken Ford", func() -> void: battle_pressed.emit())
+	battle.name = "Battle"
+	battle.custom_minimum_size = Vector2(380, 48)
+	battle.tooltip_text = "Underveil battle-fun gate: the Drowned Parish against the Barrow Host, about 500 a side"
+	add_child(battle)
 	var ver := UiKit.label("Vertical slice · run 1 · %s" % ProjectSettings.get_setting("application/config/version", "0.1"), 14, Color(1, 1, 1, 0.6))
 	ver.name = "Version"
 	add_child(ver)
@@ -86,6 +92,9 @@ func _layout() -> void:
 	var ver := get_node_or_null("Version") as Label
 	if ver:
 		ver.position = size - Vector2(330, 34)
+	var battle := get_node_or_null("Battle") as Button
+	if battle:
+		battle.position = size - Vector2(400, 96)
 	for key: String in BUTTONS:
 		var r := image_to_screen(BUTTONS[key])
 		(_buttons[key] as Button).position = r.position

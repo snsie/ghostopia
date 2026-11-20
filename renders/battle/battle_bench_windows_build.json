@@ -1,0 +1,72 @@
+{
+  "adapter": "NVIDIA GeForce RTX 5070 Ti",
+  "battle_logic_ms": {
+    "avg": 0.744437089926669,
+    "max": 6.762,
+    "p50": 0.727,
+    "p95": 0.913,
+    "p99": 0.961
+  },
+  "clans": [
+    {
+      "extra": "Fears silence · bells ringing",
+      "fighting": 235,
+      "fled": 27,
+      "n_e": 75,
+      "n_w": 154,
+      "res_e": 60.2791666666667,
+      "res_w": 60.1716720779221,
+      "routing": 155,
+      "scattered": 83,
+      "start": 500
+    },
+    {
+      "extra": "Can't cross running water · holds the fords",
+      "fighting": 423,
+      "fled": 0,
+      "n_e": 202,
+      "n_w": 221,
+      "res_e": 92.5612623762376,
+      "res_w": 92.7502828054299,
+      "routing": 0,
+      "scattered": 77,
+      "start": 500
+    }
+  ],
+  "cpu_render_ms": {
+    "avg": 0.175580278313786,
+    "max": 0.503999998092651,
+    "p50": 0.171999995827675,
+    "p95": 0.20799999833107,
+    "p99": 0.251999996066093
+  },
+  "crowd": "GPU",
+  "fps_avg": 647.743231083228,
+  "frame_ms": {
+    "avg": 1.54382161327672,
+    "max": 9.756,
+    "p50": 1.535,
+    "p95": 1.745,
+    "p99": 1.855
+  },
+  "frames": 25910,
+  "gpu_render_ms": {
+    "avg": 1.13552404495797,
+    "max": 1.47000002861023,
+    "p50": 1.12999999523163,
+    "p95": 1.18900001049042,
+    "p99": 1.20099997520447
+  },
+  "near_actors_avg": 31.9433423388653,
+  "near_actors_max": 32,
+  "os": "Windows",
+  "promotions": 367,
+  "readbacks": 6478,
+  "seconds": 40.0004180000005,
+  "target_60fps": true,
+  "units": 1000,
+  "window": [
+    1920,
+    1080
+  ]
+}

@@ -1,0 +1,17 @@
+AUTOTEST     0.0s crowd: GPU, 1000 units
+AUTOTEST     0.0s PASS enter_arena units 1000, ghost at (64.0, 8.2, 52.0)
+AUTOTEST     0.3s SHOT battle_01_overview.png
+AUTOTEST    14.1s PASS armies_engage engaged 21 / 23 after 14 s
+AUTOTEST    14.4s SHOT battle_02_lines_meet.png
+AUTOTEST    15.1s PASS near_tier_promotes 32 actors near the ghost
+AUTOTEST    16.4s PASS hit_scatters_unit 3 swings, 1 scattered by the ghost, 3 hits
+AUTOTEST    16.6s SHOT battle_03_hit_scatter.png
+AUTOTEST    17.4s PASS demotion_keeps_state unit 372 back in the crowd (actors now 0)
+AUTOTEST    51.4s PASS silence_bells silenced
+AUTOTEST    54.2s SHOT battle_04_before_rout.png
+AUTOTEST    58.2s SHOT battle_05_after_rout.png
+AUTOTEST    64.9s PASS scare_routs_flank 208 routed in 11 s (grade Legendary); Parish west flank 224 -> 48 units at Resolve 85 -> 66, east 203 units
+AUTOTEST    65.2s SHOT battle_06_flank_broken.png
+AUTOTEST    75.0s PASS counts_consistent drowned_parish 224 fighting / 180 routing / 93 scattered / 3 fled; barrow_host 313 fighting / 89 routing / 98 scattered / 0 fled; 
+AUTOTEST    75.0s perf: 165 fps · GPU crowd 1000 units · 32 near actors · battle logic 0.59 ms
+AUTOTEST    75.0s SUMMARY 8 passed, 0 failed []

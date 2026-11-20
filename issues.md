@@ -121,3 +121,39 @@ Problems hit during the tasks and the workaround used. Newest at the bottom.
 - **The tour's cottage-interior view can't match the concept's cutaway:** the real walls are there.
 - **Shell heredocs with long Markdown failed to parse again;** the docs were appended through scratch files (as in
   task1 and task4).
+
+
+## Battle prototype (2026-11-19/20)
+
+- **Whoever crossed the river first lost.** With both armies marching on the enemy's home, the Parish (12 m from the
+  river vs the Barrow's 16 m) reached the ford first, spilled out of its south mouth and were wrapped by the wider
+  Barrow line (2.5 : 1 losses even with equal stats). Fix: both clans' attack goal is the ford, formations symmetric.
+- **Fear cascades collapsed whole armies.** A fixed Resolve shock per breaking neighbour acts like bootstrap
+  percolation in a dense block: silencing the bells alone routed 341 of 500. Fix: contagion scaled by the *share* of
+  nearby allies breaking; regen only when no enemy is in engage range; ringing bells damp contagion more than scares.
+- **The near actors never moved** (first windowed run): their records carry the ACTOR flag, and the shared CPU step
+  skips flagged units, so the near tier's own sim skipped them too. Fix: the near tier clears the flag inside its sim.
+- **GPU and CPU disagreed on who wins** (`--battle-parity`: 42 % apart after 60 s). Cause: the armies compressed to
+  9 units/m² at the ford, overflowing the 24-unit hash cells; the CPU fills cells in index order, so it always dropped
+  the Barrow (indices 500–999) from overfull cells, the GPU dropped random ones. Fix: crowd pressure (packed units stop
+  pushing) and 48-unit cells: max 28 per cell, no overflow, GPU and CPU now within 2.7 % after 60 s.
+- **GDScript `:=` from untyped values** (array literals indexed, `Node`-typed references) is a parse error, and a
+  parse error in a scene script leaves the game hanging on the loading screen rather than quitting. The autotest and
+  bench reference the arena as `BattleWorld`, not `Node`. `--check-only` can't catch these (no autoloads).
+- **Writing into another object's PackedArray (`obj.arr[i] = x`) copies the whole array per write** (copy-on-write
+  through the property). The CPU sim and near tier build local arrays and assign them once.
+- **bell.gltf prints `invalid UID ... using text path instead`** for its brass texture (as task5 noted). Harmless.
+- **Not verified on macOS / Metal**: no Mac here. The macOS build exports and contains the compute shader (the same
+  SPIR-V goes through Godot's Metal path), but frame times on a Mac are still to be logged with `--battle-bench`.
+- **Benchmarked only on an RTX 5070 Ti** (a high-end GPU, not the mid-range target): ~630 fps at 1080p. The headroom
+  (~8× the 60 fps budget) suggests a mid-range GPU is fine, but that's untested.
+- **The Barrow's bone crowns read as pale as routing units from above**; their bone/fur were darkened and routing units
+  glow cyan more strongly. Placeholder art; the real clan art comes with run 2.
+- **GPU promotion could resurrect the dead:** promotions used the nearby snapshot, a few frames old, so a unit the GPU
+  had just scattered could come back as a living actor and be counted twice (the exported autotest once counted 502
+  of 500 Barrow). Fix: two-phase promotion through the GPU (decisions.md).
+- **The exported build crashed on exit** after the autotest: the arena freed its GPU buffers in `_exit_tree` through
+  render-thread calls bound to the crowd object, which could run after it (or the device) was gone. Fix: render-thread
+  calls capture the crowd strongly, buffers are freed on restart / quit to title, and the self-test modes quit through
+  `shutdown_and_quit` (stop stepping, let readbacks land, free, then quit). It was intermittent (1 in 3 runs) and had
+  no backtrace; after the fix, 5 runs in a row and the exported build exit cleanly.
