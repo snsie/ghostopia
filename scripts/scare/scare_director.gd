@@ -274,19 +274,26 @@ func boo(player: Node3D) -> Dictionary:
 	var sc := _sc()
 	var radius := float(Game.presence_level().get("scare_radius_m", 4.0))
 	var target: Npc = null
-	var best := -1.0
+	var best := -INF
+	var ray: Array = player.aim_ray() if player.has_method("aim_ray") else [player.global_position, -player.global_basis.z]
+	var cone := deg_to_rad(float(sc.get("boo", {}).get("aim_cone_deg", 30.0)))
 	for n: Npc in gw.npcs:
 		if not n.visible or not n.is_target() or not n.is_awake():
 			continue
 		var d := n.global_position.distance_to(player.global_position)
 		if d > radius:
 			continue
-		var score := n.mind.frac() * 2.0 - d / radius
+		# attacks go where the camera reticle points: only villagers inside the aim cone count
+		var to_n := n.global_position + Vector3.UP - ray[0]
+		var ang := (ray[1] as Vector3).angle_to(to_n)
+		if ang > cone:
+			continue
+		var score := n.mind.frac() * 0.5 - d / radius - ang / cone * 2.0
 		if score > best:
 			best = score
 			target = n
 	if target == null:
-		gw.hud.hint("Nobody close enough to scare")
+		gw.hud.hint("Aim the reticle at someone close enough to scare")
 		return {"outcome": "none"}
 	var to_ghost := player.global_position - target.global_position
 	var vul: Dictionary = sc.get("vulnerable", {})

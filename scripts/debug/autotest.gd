@@ -479,6 +479,7 @@ func _scares() -> void:
 	p.teleport(bram.global_position + bram.forward * 2.0 + Vector3(0, 0.5, 0), rad_to_deg(bram.rotation.y) + 180.0)
 	var n0 := bram.mind.nerve
 	Game.ecto = 100.0
+	p.aim_at(bram.head_pos())
 	p._boo_cd = 0.0
 	var res3: Dictionary = p.do_boo()
 	check("botched_boo", String(res3.get("outcome", "")) == "botch" and bram.mind.nerve > n0, "%s %s" % [res3.get("outcome"), res3.get("reason")])

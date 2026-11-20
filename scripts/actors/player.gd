@@ -477,6 +477,13 @@ func punch_in(seconds: float) -> void:
 
 # ---------------------------------------------------------------- targeting
 
+## Turns the ghost body to face where the camera reticle points, so attacks go that way.
+func face_aim() -> void:
+	var d: Vector3 = aim_ray()[1]
+	if Vector2(d.x, d.z).length() > 0.001:
+		rotation.y = atan2(d.x, d.z)
+
+
 func aim_ray() -> Array:
 	var vp := get_viewport()
 	var center := vp.get_visible_rect().size * 0.5
@@ -587,6 +594,7 @@ func try_mine() -> String:
 	if not Game.inventory.is_tool(tool):
 		return "no tool"
 	var tier := Game.inventory.tool_tier(tool)
+	face_aim()
 	_swing_left = t.f("mining.swing_s", 0.42)
 	_play_clip(_tool_clip(tool), _swing_left)
 	if not target_node.is_empty():
@@ -646,6 +654,7 @@ func do_boo() -> Dictionary:
 		gw.hud.hint("Not enough Ectoplasm to manifest")
 		return {}
 	Game.ecto -= cost
+	face_aim()
 	_boo_cd = Game.tuning.f("scare.boo.cooldown_s", 3.0)
 	manifest_left = float(Game.presence_level().get("manifest_s", 1.6))
 	sheet_mat.set_shader_parameter("manifest", 1.0)
