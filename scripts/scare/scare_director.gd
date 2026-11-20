@@ -284,8 +284,8 @@ func boo(player: Node3D) -> Dictionary:
 		if d > radius:
 			continue
 		# attacks go where the camera reticle points: only villagers inside the aim cone count
-		var to_n := n.global_position + Vector3.UP - ray[0]
-		var ang := (ray[1] as Vector3).angle_to(to_n)
+		var to_n: Vector3 = n.global_position + Vector3.UP - (ray[0] as Vector3)
+		var ang: float = (ray[1] as Vector3).angle_to(to_n)
 		if ang > cone:
 			continue
 		var score := n.mind.frac() * 0.5 - d / radius - ang / cone * 2.0
