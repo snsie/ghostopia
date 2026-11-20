@@ -27,6 +27,8 @@ var cam_yaw: Node3D
 var cam_pitch: Node3D
 var spring: SpringArm3D
 var camera: Camera3D
+var _aim_face_yaw := 0.0
+var _aim_face_left := 0.0   # seconds the body stays turned toward the reticle after an attack
 var _yaw := 0.0
 var _pitch := -0.25
 var _dist := 3.4
@@ -344,7 +346,11 @@ func _physics_process(dt: float) -> void:
 	move_and_slide()
 	if global_position.y < float(Game.layout.get("kill_y", -16.0)):
 		_respawn_at_mausoleum()
-	if hv.length() > 0.2:
+	if _aim_face_left > 0.0:
+		# mid-attack: keep facing the reticle so the attack visibly goes that way
+		_aim_face_left -= dt
+		rotation.y = lerp_angle(rotation.y, _aim_face_yaw, clampf(dt * 25.0, 0.0, 1.0))
+	elif hv.length() > 0.2:
 		rotation.y = lerp_angle(rotation.y, atan2(hv.x, hv.z), clampf(dt * 10.0, 0.0, 1.0))
 	var body_block := world.get_block_v(world.cell_of(global_position + Vector3(0, 0.35, 0)))
 	var now_phasing := Game.blocks.solid[body_block] == 1 or _in_prop()
@@ -478,10 +484,12 @@ func punch_in(seconds: float) -> void:
 # ---------------------------------------------------------------- targeting
 
 ## Turns the ghost body to face where the camera reticle points, so attacks go that way.
-func face_aim() -> void:
+func face_aim(hold_s: float = 0.6) -> void:
 	var d: Vector3 = aim_ray()[1]
 	if Vector2(d.x, d.z).length() > 0.001:
-		rotation.y = atan2(d.x, d.z)
+		_aim_face_yaw = atan2(d.x, d.z)
+		rotation.y = _aim_face_yaw
+		_aim_face_left = hold_s
 
 
 func aim_ray() -> Array:
