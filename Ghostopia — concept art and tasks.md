@@ -162,6 +162,28 @@ battlefield, wrong-coloured childhood beach, endless hospital corridor), crypt d
 Relics and cosmetics must be original designs on slasher archetypes (a masked stalker, a cursed doll, a
 clawed glove), never licensed film characters.
 
+### 4.8 Underveil (run 2; see "The Underveil" in `docs/design/design-plan.md`)
+
+Underveil mood add-on (use instead of the surface moods): `Deep underground, no sky: lit only by glowing
+fungus, votive candles, lanterns and the soft pulse of memory veins in the rock; cool dark blue-violet
+shadows with warm pools of clan light, drifting motes, cozy-eerie, not horror.`
+
+Locations (`concept/locations/underveil_<place>.png`, plus an empty version per 4.2 for task3):
+
+- **Glowcap Warrens** (Mycelial Kin): `A vast cavern forest of giant glowing teal mushrooms built from chunky voxel blocks, little homes carved into the stalks, spore lanterns on ropes, a slow fungus farm, gentle mushroom-capped dead folk tending it, a small cute ghost being welcomed.`
+- **The Drowned Nave** (Drowned Parish): `A sunken stone chapel half-flooded in an underground lake, pews poking out of still water, a bell tower rising from the water with its rope trailing, orange votive candles floating on the surface, a waterlogged congregation singing from hymnals, a ferryman's boat at a landing.`
+- **The Barrow Halls** (Barrow Host): `Huge earthen burial-mound halls under the ground, timber-and-turf vaults, bronze lanterns, stacked shields and war horns, a stone throne for a chieftain wearing a bone-and-iron crown, warband dead sharpening bronze blades.`
+- **The Sunken Ford** (the war front): `A wide underground river crossed by a shallow stone ford and a broken bridge, a huge glowing memory vein running through the cliff above it; on one bank a host of drowned parishioners with bells and votive light, on the other an army of barrow warriors with bronze lanterns and shields; hundreds of small figures, a battle about to begin, a tiny cute ghost watching from a ledge.`
+- **The Candle Court** (Velvet Wake): `An elegant underground ballroom for an endless funeral feast: long tables, black lace, tall candelabras, mirrors draped in velvet, charming veiled mourners raising glasses; something slightly wrong (candles burning downward, a mourner whose reflection is missing).`
+- **Ossuary Deep** (Bonewardens): `A cold cavern fortress built from stacked bones and skulls in tidy voxel patterns, white cold light, skeleton patrols in bone armor on the walls, a gate of ribs.`
+- **Underveil map** `concept/locations/underveil_map.png`: `Top-down stylized map of an underground world of linked cavern regions joined by tunnels and dark rivers: a mushroom forest, a flooded chapel lake, earthen burial halls, a ford on the central river, a candlelit ballroom, a bone fortress, and three shafts leading up to a village on the surface. Readable like a game level map. No text, no labels, no frame.`
+
+Clans (character add from 4.4; `concept/characters/clan_<name>.png`): one lineup per clan of a common
+soldier, a captain, a banner or bell bearer and a civilian, all cute-spooky with no gore:
+Mycelial Kin (mushroom-cap hats, spore lanterns), Drowned Parish (waterlogged Sunday clothes, hymnals,
+bell ropes), Barrow Host (bronze, bone-and-iron crowns, earthen shields, war horns), Bonewardens (bone
+armor, tidy skeletons), Velvet Wake (black lace, veils, wine glasses, a hidden tell on each).
+
 ## 5. Task files
 
 `task1.md`–`task5.md`, written from the pipeline templates and scoped to the vertical slice:

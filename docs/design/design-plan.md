@@ -33,6 +33,8 @@ The Veil is a procedurally generated voxel world stitched together from memories
 
 Smaller memory pockets can appear between biomes as rare landmarks: a foggy battlefield, a childhood beach where the sand is the wrong color, a hospital corridor that never ends. These hold dense memory fragments and unique residents.
 
+Beneath all of it lies the **Underveil**, where land the Hollow eats sinks and the forgotten dead live in warring clans (see The Underveil).
+
 ## Core gameplay loop
 
 Scaring the living sits at the center of the loop: it is the only source of Fright for leveling and the main source of Remembrance that keeps your land intact.
@@ -215,6 +217,120 @@ Dungeons run from early crypts to late-game demon portals and are the main sourc
 
 Closing a demon portal permanently lowers demon raids in that region, which gives late-game players a reason to push outward rather than turtle.
 
+## The Underveil
+
+*Proposal, Nov 19, 2026. Everything here is a draft for Scott to accept, cut, or change; the calls that most need a decision are under Open questions.*
+
+The Underveil is a vast underground afterlife beneath the surface Veil, where the forgotten dead have organized into clans and fight over the last scraps of memory. It gives the game a second half that the surface can't: politics, alliances, and large-scale battles, while keeping the rule that you win by scaring, not by killing.
+
+### Where it comes from
+
+When the Hollow eats an unremembered chunk, the chunk doesn't vanish; it sinks. The Underveil is where forgotten places and forgotten people end up: drowned chapels, collapsed barrows, whole streets nobody thinks about any more, wedged together in the dark. The dead who live there have no living to remember them, so they cling to **Memory Veins**, glowing seams where a sunken place still holds a little remembrance. A clan that holds veins stays whole. A clan that loses them fades. That is what every war down here is about.
+
+This ties the Underveil to the surface loop in both directions. Neglect on the surface feeds the Underveil, and what happens below reaches back up (see Rewards).
+
+### Getting there and getting around
+
+- **Descents.** The three caverns under Millbrook (Fungal Grotto, Flooded Ossuary, Crystal Hollow) become the first descents. Each opens a passage to a different part of the Underveil, so the clans you already met in the slice are the clans you meet first.
+- **Regions.** The Underveil is a network of large regions (cavern halls, fungal forests, flooded naves, barrow halls), each its own voxel map loaded on descent, joined by tunnels and underground rivers. Each region shows which clans hold it, how many veins it has, and whether a battle is happening there.
+- **Daytime content.** Underground is always shaded, so day, which drains you on the surface, becomes Underveil time. Night stays scaring time above. That gives the day/night rhythm two halves instead of one long shelter.
+- **Folklore still applies.** Running water still stops spirits, so **underground rivers are the borders** between clan territories, and fords and bridges are where battles happen. Salt, iron, and bells work as they do above.
+
+### The clans
+
+Five clans for the first Underveil run, covering every stance Scott described (two of them for the war), plus the existing Crystal Hollow sentinels as unaligned wildlife. All are original designs.
+
+| Clan | Stance | Who they are | Home | Look and feel |
+|---|---|---|---|---|
+| **The Mycelial Kin** | Friendly | Gentle dead who let fungus grow through them so they'd never be fully forgotten; the Spore Keeper is one of them | Glowcap Warrens, through the Fungal Grotto | Teal mushroom caps for hats, spore lanterns, slow and kind |
+| **The Drowned Parish** | At war | A whole congregation drowned when their chapel flooded; the Ferryman rows for them | The Drowned Nave, through the Flooded Ossuary | Waterlogged Sunday clothes, hymnals, bell ropes, orange votive glow |
+| **The Barrow Host** | At war | Ancient chieftains and their warbands from burial mounds that sank whole | The Barrow Halls | Bronze lanterns, bone-and-iron crowns, earthen shields, war horns |
+| **The Bonewardens** | Hostile | Skeletons who refused to let go of their bodies and despise ghosts for letting go (the Crypt's skeleton raiders are their outcasts) | Ossuary Deep | Bone armor, rattling patrols, cold white light |
+| **The Velvet Wake** | Deceptive | An endless funeral party: charming, generous mourners who host every visitor | The Candle Court | Black lace, veils, candelabras, a feast that never ends |
+
+**The Parish–Barrow war.** The Drowned Parish and the Barrow Host have fought for generations over the **Sunken Ford**, the richest Memory Vein in the upper Underveil. The war is uneven by design: the drowned are the one kind of dead that *can* move through water, so rivers are their highways, while the Barrow Host cannot cross them and fights for bridges and fords. Each side has a cause the player can sympathize with, and each will ask for help.
+
+**The Bonewardens** attack ghosts on sight and raid the edges of other clans' land. They can't be befriended at first. Breaking enough of their patrols, or returning their outcasts' bones, opens a grudging truce (a stance change Scott may or may not want; see Open questions).
+
+**The Velvet Wake** is friendly on the surface. They trade, offer shortcuts and gossip, and say kind things about you. In fact they feed on their guests' remembrance (staying too long at the feast quietly drains your Presence), and they sell your secrets to both sides of the war. Players expose them with the same **Read** skill used on villagers: tells such as a veil that slips, candles that burn downward, or a mourner whose story changes. Catching a lie and confronting them turns them hostile but frees the souls they've been keeping.
+
+**Crystal sentinels** stay as they are in the slice: unaligned guardians that react to footsteps and defend crystal deposits without taking sides.
+
+### Clan standing
+
+Each clan has a **Standing** with you from Hated to Kin, shown in the journal. Helping, trading, returning lost memories to a clan, and winning its battles raise it. Scaring its people, siding with its enemies, and being caught in a lie lower it. The Velvet Wake shows a *false* Standing until you expose them, so the journal itself lies to you about them.
+
+Standing gates trade, recipes, clan quests, safe passage through territory, and recruits.
+
+### How a ghost fights a war: Resolve
+
+The dead don't have Nerve the way the living do, but they have **Resolve**: how firmly they hold onto who they were. Every undead unit has Resolve, and a unit whose Resolve breaks routs: it drops its weapon, forgets why it was fighting, and flees toward home. Resolve is the only "health bar" that matters in a battle.
+
+That makes battles a scale-up of the core scare instead of a combat system bolted on beside it:
+
+- **Read.** Each clan fears something: the Drowned Parish fears silence (the bells stopping), the Barrow Host fears being nameless, the Bonewardens fear their bones being scattered, and the Kin fear fire. Learn it by watching and listening to the clan, as with villagers.
+- **Build.** Your abilities scale to armies. *Haunting:* snuff a clan's braziers, ring or silence its bells, haunt its war drums so they beat out of time. *Possession:* possess a banner bearer and walk them off the field (their unit follows), or a captain (the Hostile Takeover capstone turns them on their own side). *Telekinesis:* drop stalactites, collapse a tunnel mouth, Hold a bridge gate shut.
+- **Break.** When a flank's Resolve is low and its fear is in play, a big scare breaks it, and a breaking unit lowers the Resolve of the units around it. Routs spread like the chain reactions on the surface: one well-timed scare can collapse a whole battle line. Battles are graded like scares (Spooked, Terrified, Legendary) by how much you broke with how little.
+
+**Ghosts can also do real damage** *(decided Nov 19, 2026)*. Every undead unit has a **Form** bar alongside Resolve, and taking either to zero takes it out of the fight:
+
+| | Form hits zero | Resolve hits zero |
+|---|---|---|
+| What happens | Scattered: the unit bursts into wisps and drifts back to its clan's Memory Vein, out of this battle | Routed: the unit flees home and spreads fear to its neighbors |
+| How you cause it | Spectral tool swings (the sledgehammer hits hardest, the scythe sweeps), BOO's burst at close range, telekinetic throws, collapsing rock | Clan fears, haunted war gear, possessed banner bearers and captains, big scares |
+| Scale | One unit at a time, or a small group | Spreads through the crowd |
+| Effect on the war | Costs the clan strength in this region | Costs the clan strength and Standing in this region, and lowers its Resolve in the next battle |
+
+Both work, and they work together: damage lowers Resolve a little (getting hit by a ghost is frightening), and a shaken unit takes extra damage. Fighting is the reliable way through a skirmish or a Bonewarden patrol. Breaking Resolve is how one ghost swings a battle of hundreds. Under the "scare to grow" pillar, Fright still comes only from scares and breaks; scattering a unit pays materials (bone, bronze, drowned silver) rather than Fright.
+
+Scattered undead aren't gone forever, since the dead can't die twice: they re-form at their vein over time, which is why holding veins decides wars. A clan that loses its veins can't re-form, and that is how a clan fades.
+
+You never need to destroy hundreds of skeletons one by one. You can fight your way through a skirmish, but a ghost wins a war by finding the right moment to make an army forget why it came.
+
+Ghosts take damage in battles from clan weapons and clan magic, so a battle is also dangerous for you. Wading into the middle of a melee is a bad idea; picking the moment and the spot is the skill. Tool tiers and gear from clan Standing raise your damage and defense down here.
+
+### Battle scale
+
+| Scale | Size | Where | What the player does |
+|---|---|---|---|
+| Skirmish | Up to about 40 total | Patrols, raids, ambushes, anywhere | Fight and scare individual undead up close |
+| Battle | 100 to 300 per side | Contested border regions, fords, bridges | Break flanks, take out captains, shape the line |
+| Great Battle | About 1,000 total across two or three clans | Scripted set pieces at turning points of a war (the Sunken Ford) | Sway the outcome of the war |
+
+### Wars without you
+
+Each clan's strength in each region is simulated all the time, even when you are on the surface. Every in-game hour, clans with more Memory Veins grow, clans that lost veins fade, and fronts move along region borders. A journal **war map** shows who holds what. Arriving at a region where a front is active turns those numbers into a real battle, and the result of that battle (or the simulated result if you stay away) changes the map.
+
+Wars can end: a clan can be pushed back to its home region, sign a truce you broker, or (if nobody helps it) fade entirely, which leaves its memories for the Hollow and its territory for its neighbors.
+
+### Rewards
+
+- **Fright** still levels your paths: scares in the Underveil pay out to whichever paths you used, as on the surface.
+- **Underveil materials:** Memory Vein shards (dense memory fragments), deepstone, glowcaps, drowned silver, barrow bronze, and bone.
+- **Clan recipes and relics** from Standing: a Kin spore lantern, a Parish bell, a Barrow war horn, and other original relics for your displays.
+- **Recruits.** A clan you are Kin with lets some of its dead come home with you. Giving one a grave on the surface makes them remembered again and turns them into a named resident with a skill from their clan. This is the main way to grow your graveyard beyond the village's own dead.
+- **Holding the line below.** Memory Veins held by clans friendly to you slow Hollow erosion in the surface chunks above them, so underground politics protect your base.
+
+### How the battles work technically
+
+Hundreds of units per clan is beyond Godot's normal node-per-character approach, so the Underveil uses a three-tier simulation:
+
+| Tier | Who | Simulation | Rendering |
+|---|---|---|---|
+| Near | Up to about 32 units closest to the ghost, plus anyone being read, possessed, or talked to | Full CPU actors (`CharacterBody3D`) with AI, physics, dialogue, and all scare interactions | Rigged glTF characters from Blender |
+| Crowd | Everyone else in the loaded region (hundreds per clan) | GPU compute shader through `RenderingDevice`: steering, separation, flow-field movement, melee contact, and Resolve | `MultiMeshInstance3D` per clan and unit type, with vertex-animation textures baked by Blender scripts |
+| Abstract | Every region not loaded | CPU war simulation: clan strength, veins, and fronts per region | None, or the war map |
+
+- **Flow fields** are baked per clan objective on a coarse grid of the region (one field per goal, shared by all units heading there), so pathfinding cost doesn't grow with unit count.
+- **Resolve runs on the GPU too:** every unit samples nearby routing units in the same spatial hash it uses for separation, which is what makes routs cascade across hundreds of units for free.
+- **Ghost hits reach the crowd:** single-target hits land on near-tier actors. Area effects (BOO bursts, telekinetic throws, rockfalls, scares) are written each frame into a small GPU buffer of hit spheres, and every crowd unit inside one loses Form or Resolve in the same compute pass.
+- **Terrain** for the crowd is a baked height and occupancy texture of the region, rebaked when blocks change.
+- **Promotion and demotion:** units move between the crowd and near tiers as the ghost moves, swapping a MultiMesh instance for a real actor and back, carrying their state across.
+- **Readback stays small:** the CPU reads a compact summary (deaths, routs, front-line positions, per-clan counts) a few times a second, never the full unit buffer every frame.
+- **Headless tests:** Godot's headless mode has no `RenderingDevice`, so the crowd sim also has a slower CPU reference implementation with the same data layout. Unit tests and `--autotest` run on the CPU version; a `--battle-bench` mode runs the GPU version on real hardware and logs frame times.
+- **Budget:** 60 fps at 1080p on a mid-range GPU with 1,000 crowd units and 32 near actors, on both Windows (Vulkan) and macOS (Metal). The project uses the Forward+ renderer, which supports compute; a Web build would need the CPU path with a much smaller army.
+- **Pipeline fit:** Blender scripts produce the clan characters, bake their vertex-animation textures, and write region layouts and clan population as JSON, as for Millbrook.
+
 ## Cosmetics and relic displays
 
 Cosmetics let players dress their ghost and their workers, and relic displays turn trophies into a Horror Level stat for the base.
@@ -227,6 +343,8 @@ Cosmetics let players dress their ghost and their workers, and relic displays tu
 ## Development roadmap
 
 Build the smallest thing that proves scaring is fun before adding the base, defense, and later biomes.
+
+**Underveil.** Before any Underveil content is built, a battle prototype has to pass a **battle-fun gate**, the same way scaring had to pass the scare-fun gate: one flat cavern region, two clans of about 500 each, flow fields, melee, Resolve and rout cascades, MultiMesh rendering, promotion and demotion around the ghost, and `--battle-bench` frame times on Windows and macOS. If breaking a flank with one well-timed scare doesn't feel great, rethink the design before making clans. If it does, run 2 of task1 to task5 builds the upper Underveil: the five clans, the Glowcap Warrens, Drowned Nave, Barrow Halls, and Sunken Ford regions, and the war map.
 
 The prototype needs only one biome, a ghost that drifts and phases, mining with memory fragments, and the first two Haunting levels against a few villagers who have fears, an Unease meter, visible reactions, and simple memory of your tricks. If scaring a villager with a creaking door and a slamming wardrobe isn't fun, no amount of graveyard building will fix it, so that gate comes first. Chunk-based voxel meshing and a turn-penalized pathfinder for spirit roads are the two technical risks worth spiking early. The project is built in Godot, so the first spike compares the community Voxel Tools module against a custom chunk mesher before committing.
 
@@ -278,3 +396,10 @@ The main risk is spec quality: Haiku executes a clear spec well and a vague one 
 - [ ] Is there an ending, such as helping residents move on and eventually moving on yourself, or is it fully open-ended?
 - [ ] Should a fourth path (Manifestation: moans, apparitions, size changes) exist, or stay folded into Presence?
 - [ ] Do the living ever fight back directly outside Ghost Hunter raids?
+- [ ] Underveil: is Hollow-eaten land sinking into the Underveil the right origin story?
+- [ ] Underveil: are the five clans (Mycelial Kin, Drowned Parish, Barrow Host, Bonewardens, Velvet Wake) the right cast, and do the names fit?
+- [x] Underveil: ghosts can damage undead (Form) as well as break Resolve. *Decided Nov 19, 2026.*
+- [x] Underveil: a handful of large linked regions, each its own voxel map. *Decided Nov 19, 2026.*
+- [ ] Underveil: does scattering undead pay Fright, or only materials (proposed)?
+- [ ] Underveil: can Bonewardens ever become friendly, and can the player end a clan entirely?
+- [ ] Underveil: is day-underground, night-on-the-surface the right rhythm, or should the Underveil have its own clock?
